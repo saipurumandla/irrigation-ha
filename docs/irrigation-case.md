@@ -9,6 +9,9 @@ plug**. Agreed 2026-10-31; sizes are estimates until the parts are measured. See
 
 ## Layout (about 190 × 220 × 66 mm)
 
+Confirmed 2026-11-02: A8 + screen across the top; under it the incoming-wires bay (left, easy
+cover) and the power bay (right, screwed cover). One print on the 260 mm bed.
+
 | Part of the box | Holds | Opened |
 |---|---|---|
 | **Upper, sealed** | KC868-A8 on its base plate; the Hosyond screen on the lid, over the A8's **right half** (the A8's ESP32 antenna at the left end stays under plain plastic) | rarely: lid hooks over a lip at the top, held by 2 screws reached from the wiring bay |
