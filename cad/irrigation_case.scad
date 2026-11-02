@@ -255,7 +255,8 @@ module lid() {
         // the window
         translate([sx - scr_window[0] / 2, sy - scr_window[1] / 2, -1]) rcube([scr_window[0], scr_window[1], lid_t + 2], 2);
         // microphone, at the screen's left end
-        translate([sx - scr_board[0] / 2 + 6, sy + 12, -1]) cylinder(d = 2, h = lid_t + 2);
+        // (from the front photo: 6.4 mm from the board's left edge, 9.7 mm from its top)
+        translate([sx - scr_board[0] / 2 + 6.4, sy + scr_board[1] / 2 - 9.7, -1]) cylinder(d = 2.5, h = lid_t + 2);
         // "IRRIGATION" (cut 0.6 mm: a colour change, or paint)
         translate([18, lh - 20, lid_t - 0.6]) linear_extrude(1) text("IRRIGATION", size = 9, font = "Liberation Sans:style=Bold");
     }
