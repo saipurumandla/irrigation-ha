@@ -163,7 +163,10 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
 - Glands (combo set), thread for the holes: PG7 12.5, PG9 15.2, PG11 18.6, PG13.5 20.4 mm.
   Valve cable thickness still to measure (5-10 mm: PG11, 10-12 mm: PG13.5).
 - M3 heat-set inserts (a set): hole size from the test strip.
-- Still to measure on arrival: EVEPS and CPT converters, the screen; the wall space and the
+- EVEPS EV36-A121203 (seller's drawing): 70 mm over its two slotted mounting tabs x 40 mm; height
+  not given (about 20-22 mm, use 22 until measured); all four wires leave one long side; input
+  10-28 V AC (check the transformer's no-load voltage first: the Rain Bird's read 28.8-29.3 V).
+- Still to measure on arrival: the EVEPS height, the CPT converter, the screen; the wall space and the
   distance to the outlet.
 
 **Decided 2026-11-02: no exact terminal positions.** Wires pass behind the board through one
