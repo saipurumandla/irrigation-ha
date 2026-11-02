@@ -53,6 +53,11 @@ outlet → Centropower PSU-40 (24 V AC 40 VA, auto-reset PTC; plugs in, 120 V st
 
 ## Terminals
 
+Decided 2026-11-02: only a **rain sensor** and a **flow sensor** (for water used per zone; maybe a
+ZJ-B10S, later) come in from outside, so 12 + 5 positions as below. 12 V, 5 V and 3.3 V stay inside
+on the Wagos. The transformer is a Class 2 plug-in doorbell transformer (24 V AC 40 VA,
+auto-reset): two wires, no ground needed. No speaker in the lid.
+
 | WIRING (left) | | POWER (right) | |
 |---|---|---|---|
 | Z1-Z8 | zone wires → relay NO1-NO8 | 24V, 0V | transformer |
