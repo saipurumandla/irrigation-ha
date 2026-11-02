@@ -311,6 +311,45 @@ module test_base() {   // a thin plate with the 4 standoffs: put the real A8 on 
     }
 }
 
+module test_fits() {   // the tight spots, on thin plates: converters, Wagos, strip tray, gland, rail, keyhole
+    f = 1.2;   // floor
+    // converters: their pockets as in the box
+    cube([eveps[0] + 2 * pocket_wall + 4, eveps[1] + 2 * pocket_wall + 4, f]);
+    translate([2, 2, f]) pocket(eveps);
+    translate([eveps[0] + 12, 0, 0]) { cube([cpt[0] + 2 * pocket_wall + 4, cpt[1] + 2 * pocket_wall + 4, f]); translate([2, 2, f]) pocket(cpt); }
+    // Wagos 2 x 2
+    translate([eveps[0] + cpt[0] + 22, 0, 0]) {
+        cube([2 * (wago[0] + 2.4) + 4, 2 * (wago[1] + 2.4) + 4, f]);
+        translate([1, 1, f]) for (i = [0, 1], j = [0, 1]) translate([i * (wago[0] + 2.4), j * (wago[1] + 2.4), 0]) difference() {
+            cube([wago[0] + 3.2, wago[1] + 3.2, 4]);
+            translate([1.6, 1.6, 1]) cube([wago[0] + 0.4, wago[1] + 0.4, 4]);
+        }
+    }
+    // the terminal strip tray: its first 30 mm and the insert post
+    translate([0, eveps[1] + 14, 0]) {
+        translate([-8, 0, 0]) cube([46, strip12[1] + 7, f]);
+        translate([6, 2, f]) intersection() { strip_pocket(strip12); translate([-14, -1, -1]) cube([44, 30, 30]); }
+    }
+    // PG7 gland hole and the keyhole, in walls as thick as the box's
+    translate([54, eveps[1] + 14, 0]) difference() {
+        cube([30, 26, wall]);
+        translate([15, 13, -1]) cylinder(d = pg7_d, h = wall + 2);
+    }
+    translate([90, eveps[1] + 14, 0]) difference() {
+        cube([24, 30, back]);
+        translate([12, 7, 0]) keyhole();
+    }
+    // the wiring cover's slide: a rail on a wall stub, and a cover piece that rides on it
+    translate([120, eveps[1] + 14, 0]) {
+        cube([30, 4, 14]);                                        // wall stub, standing
+        translate([0, 4, 14 - cover_t - 2.4]) cube([30, 1.2, 1.2]);   // the rail, as in the box
+    }
+    translate([120, eveps[1] + 24, 0]) difference() {           // a cover piece, printed flat
+        union() { cube([30, 20, cover_t]); translate([0, 0, cover_t]) cube([30, 2.6, 1.6]); }
+        translate([-1, 1.3 - 0.1, cover_t - 0.1]) cube([32, 1.4, 1.4]);
+    }
+}
+
 // ── Assembly preview ──────────────────────────────────────────────────────
 module assembly(explode = 0) {
     color("WhiteSmoke") box();
@@ -346,3 +385,4 @@ else if (part == "wiring_cover") wiring_cover();
 else if (part == "power_cover") power_cover();
 else if (part == "test_inserts") test_inserts();
 else if (part == "test_base") test_base();
+else if (part == "test_fits") test_fits();
