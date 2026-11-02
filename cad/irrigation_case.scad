@@ -259,13 +259,17 @@ module lid() {
             // the screen's 4 posts (behind the lid, toward the A8)
             for (dx = [-1, 1], dy = [-1, 1])
                 translate([sx + dx * scr_holes[0] / 2, sy + dy * scr_holes[1] / 2, -scr_post_h])
-                    difference() { cylinder(d = scr_post_d, h = scr_post_h); translate([0, 0, -1]) cylinder(d = scr_screw_d, h = scr_post_h); }
+                    cylinder(d = scr_post_d, h = scr_post_h);
             // 2 hooks at the top (into the slots under the box's top wall)
             for (x = [W / 2 - 50, W / 2 + 50]) translate([x - wall - 7.5, lh - 0.1, 0]) cube([15, 1.4, lid_t]);
             // the bottom flange with 2 insert holes (screwed from the wiring bay)
             translate([0, 0, -12]) cube([lw, 2.4, 12]);
             for (x = [30, wiring_w - 30]) translate([x, 1.2, -10]) rotate([-90, 0, 0]) insert_boss(1.2);
         }
+        // the screen screws' holes: through the posts and 1 mm into the lid (1.4 mm left in front),
+        // so M3 x 5 or x 6 fits (board 1.6 + post 4.4 + 1)
+        for (dx = [-1, 1], dy = [-1, 1])
+            translate([sx + dx * scr_holes[0] / 2, sy + dy * scr_holes[1] / 2, -scr_post_h - 1]) cylinder(d = scr_screw_d, h = scr_post_h + 2);
         // the window
         translate([sx - scr_window[0] / 2, sy - scr_window[1] / 2, -1]) rcube([scr_window[0], scr_window[1], lid_t + 2], 2);
         // microphone, at the screen's left end
