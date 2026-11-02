@@ -124,6 +124,32 @@ GUBCUB terminal strips, M3 screw kit, M3 heat-set inserts, Hosyond ESP32-S3 3.5"
 gland pack, wall screws and anchors, PETG, soldering iron, Wagos, 18/2 thermostat wire,
 heat-shrink.
 
+## Measured (KC868-A8, 2026-11-02, calipers; orange relay block at the top)
+
+| What | Inches | mm |
+|---|---|---|
+| Board, left-right | 5 | 127.0 |
+| Board, top-bottom | 4.35 | 110.5 |
+| Overall left-right, with what sticks out | 6 | 152.4 |
+| H1-H4: half holes (open at the edge), one per corner, centre from the edge | 0.1 | 2.5 |
+| H5 (full hole, on the corner flap): from left / from top | 0.1 / 0.54 | 2.5 / 13.7 |
+| H6 (full hole): from left / from top | 2.715 / 0.7 | 69.0 / 17.8 |
+| H7 (full hole): from right / from top (= 3.5" / 88.9 mm from left) | 1.5 / 1.8 | 38.1 / 45.7 |
+| 2.25" on the sketch: straight part of the right edge between the corner notches (to confirm) | 2.25 | 57.2 |
+
+**From the "Kincony KC868-A8 Rail Mount" model (Printables 6665458; STL files kept by the user,
+not in the repo), which fits the board:**
+- Base plate (Grundplatte.stl): 152.2 x 110.2 mm, 4.4 mm thick; the measured outline.
+- The board's 4 screws: standoffs Ø8 mm, 2.4 mm tall on the 2 mm plate (that gap clears the
+  solder leads under the board, checked by the user), each with a Ø2.0 mm hole (self-tapping M2 /
+  M2.5 into plastic), at (from the plate's left, from its top) 13.6 / 7.5, 139.1 / 7.5, 42.4 / 61.8 and
+  68.9 / 89.8 mm. These win over the hand measurements of H5-H7 above.
+- Its enclosure (Gehause_1.stl) stands 46.4 mm out from the plate: everything on the board fits
+  in about 42 mm above it. Enough for the planned 66 mm box.
+
+Still useful to measure: how far the orange and green blocks stick out past the top and bottom
+edges (for the wiring channels), and the relay screw row's distance from the edge.
+
 ## Needed before modelling
 
 1. Base plate: length × width, hole positions and diameter.
