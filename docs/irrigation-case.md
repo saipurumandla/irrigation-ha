@@ -19,9 +19,9 @@ plug**. Agreed 2026-10-31; sizes are estimates until the parts are measured. See
   Kobra X's multi-colour.
 - Jumpers from the terminals up to the A8 are wired once and **run behind the A8**: the A8 sits
   on a printed **base** whose back face has the wire channels; the box's back wall closes them.
-  A row of **holes through the base** sits just above the relay screws (one per wire), and another
-  row at the bottom opens into the bays, so a jumper goes from its relay screw straight through its
-  hole, down its channel, and out next to its terminal. Nothing shows in front, beside or behind
+  A long **slot through the base** runs along the relay edge, and another along the green blocks'
+  edge opens into the bays, so a jumper goes from its relay screw through the slot, down its
+  channel, and out next to its terminal. Nothing shows in front, beside or behind
   the board. Adds about 8 mm of depth. All 8 zones, COM and power are pre-wired now, so the
   channels never need opening. Ends marked Z1… with heat-shrink or tape.
 - The **screen cable** (4 wires: 5 V and GND from the CPT, plus TX/RX to two of the A8's sensor terminals)
@@ -147,8 +147,14 @@ not in the repo), which fits the board:**
 - Its enclosure (Gehause_1.stl) stands 46.4 mm out from the plate: everything on the board fits
   in about 42 mm above it. Enough for the planned 66 mm box.
 
-Still useful to measure: how far the orange and green blocks stick out past the top and bottom
-edges (for the wiring channels), and the relay screw row's distance from the edge.
+Relay terminals (user, 2026-11-02): 24 screws 5.0 mm apart, the row centred along the relay
+edge (between the corner half holes), about 10.5 mm in from that edge; the orange block is flush
+with the edge (doesn't stick out); the board is 1.6 mm thick.
+
+**Decided 2026-11-02: no exact terminal positions.** Wires pass behind the board through one
+long slot along the relay edge and one along the green blocks' edge (not a hole per screw), so
+only the footprint, the 4 standoffs and the height (42 mm) have to be exact. The A8 is wired with
+the lid open; anything can be changed later by opening it.
 
 ## Needed before modelling
 
