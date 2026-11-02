@@ -57,12 +57,12 @@ pocket_wall = 1.6;
 pocket_h = 6;
 
 // ── Screen (Hosyond ESP32-S3 3.5") in the lid ─────────────────────────────
-scr_board = [100, 54];
-scr_hole_inset = 3;     // corner holes, from the edges (to check on the board)
-scr_window = [76, 51];  // visible area about 74 x 49
-scr_post_h = 4.5;       // glass + frame in front of the board (to check)
+scr_board = [101.5, 54.5];   // seller: 54.5 x 101.5 x 10 mm; 320 x 480 IPS, capacitive
+scr_holes = [92, 45];   // corner holes, centre to centre (measured 2026-11-02)
+scr_window = [76, 51];  // picture 73.4 x 49.0 (standard 3.5" 320 x 480), centred on the board
+scr_post_h = 4.4;       // the glass stands 4.07 mm above the board (5.67 with it, measured); 0.3 air
 scr_post_d = 6;
-scr_screw_d = 2.2;      // M2.5 self-tapping (to check)
+scr_screw_d = 2.2;      // M2.5 self-tapping, through the board's 3 mm holes
 scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y set below
 
 // ── Bays ──────────────────────────────────────────────────────────────────
@@ -244,7 +244,7 @@ module lid() {
             rcube([lw, lh, lid_t], 2);
             // the screen's 4 posts (behind the lid, toward the A8)
             for (dx = [-1, 1], dy = [-1, 1])
-                translate([sx + dx * (scr_board[0] / 2 - scr_hole_inset), sy + dy * (scr_board[1] / 2 - scr_hole_inset), -scr_post_h])
+                translate([sx + dx * scr_holes[0] / 2, sy + dy * scr_holes[1] / 2, -scr_post_h])
                     difference() { cylinder(d = scr_post_d, h = scr_post_h); translate([0, 0, -1]) cylinder(d = scr_screw_d, h = scr_post_h); }
             // 2 hooks at the top (into the slots under the box's top wall)
             for (x = [W / 2 - 50, W / 2 + 50]) translate([x - wall - 7.5, lh - 0.1, 0]) cube([15, 1.4, lid_t]);

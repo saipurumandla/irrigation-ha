@@ -177,7 +177,12 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
   10-28 V AC (check the transformer's no-load voltage first: the Rain Bird's read 28.8-29.3 V).
 - CPT C1205003 (seller's drawing): body 46 x 27 x 14 mm, slotted tabs at both short ends (about
   58 mm over them, to confirm), all four wires leave one long side, leads about 13.5 cm.
-- Hosyond ESP32-S3 3.5" screen (seller's picture): board 100 x 54 mm, a mounting hole in each
+- Hosyond screen, measured on arrival (2026-11-02): board 101.5 x 54.5 mm, 10 mm deep with the parts
+  behind; holes 92 x 45 mm centre to centre, 3 mm (M2.5 self-tapping into the lid's posts); 5.67 mm
+  board + glass (glass 4.07 above the board: posts 4.4); picture 73.4 x 49.0 centred (window 76 x
+  51). One socket, UART (5V GND TXD RXD), on the bottom edge carries the A8 link and its power;
+  USB-C and RESET/BOOT on the end opposite the mic (reached with the lid open).
+- Hosyond ESP32-S3 3.5" screen (seller's picture, before it arrived): board 100 x 54 mm, a mounting hole in each
   corner about 3 mm in from the edges; the glass spans about 9.5-92 mm along the board, visible
   area about 74 x 49 mm (lid window about 76 x 51 mm); mic hole on the left end; comes with a
   speaker, an SH1.25-to-Dupont 4-wire cable (the A8 link) and USB-C. Thickness not given: 15 mm
