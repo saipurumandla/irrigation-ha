@@ -255,6 +255,45 @@ module base() {
 }
 function a8_hole_xy(p) = [a8_x0 - wall + p[0], (a8_y0 - up_y0) + (a8_flip ? p[1] : a8_h - p[1])];
 
+// ── Labels (2nd colour) ────────────────────────────────────────────────────
+// Each label is cut 0.6 mm (3 layers) into its part and printed as an inlay in the second
+// colour: load the part and its *_labels STL together in OrcaSlicer as one object (parts), and
+// give the labels the 2nd filament. The parts print face down, so the colour is only in their
+// first (or, for the inside of the wiring cover, last) 3 layers.
+label_d = 0.6;
+bold = "Liberation Sans:style=Bold";
+wire_colours = ["Z1 red", "Z2 blue", "Z3 yellow", "Z4 green", "Z5 black", "COM white"];
+strip12_labels = ["Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "COM", "COM2", "RAIN", "RAIN"];
+strip5_labels = ["24V", "0V", "FLOW+", "SIG", "GND"];
+
+module lid_label() {
+    translate([18, up_h - 0.6 - 20, lid_t - label_d]) linear_extrude(label_d + 0.01) text("IRRIGATION", size = 9, font = bold);
+}
+module wiring_cover_label() {
+    translate([12, lower_h / 2 + 8, cover_t - label_d]) linear_extrude(label_d + 0.01) text("Z1-Z8  COM  RAIN", size = 7, font = bold);
+    // inside: which valve wire is which (read from inside, so mirrored)
+    for (i = [0 : len(wire_colours) - 1])
+        translate([wiring_w - 0.6 - 14 - (i % 3) * 36, 22 - floor(i / 3) * 9, 0]) mirror([1, 0, 0])
+            linear_extrude(label_d + 0.01) text(wire_colours[i], size = 4.5, font = bold);
+}
+module power_cover_label() {
+    translate([8, lower_h / 2 - 4, cover_t - label_d]) linear_extrude(label_d + 0.01) text("POWER", size = 7, font = bold);
+}
+module clip_labels(s, names) {   // one name beside each position, on the clip's top (upright text)
+    pitch = s[0] / len(names);
+    tray = s[1] + 3.2;
+    for (i = [0 : len(names) - 1])
+        translate([1.6 + pitch * (i + 0.5), tray / 2 + 1.2, 2.4 - label_d]) rotate([0, 0, 90])
+            // names of 4+ letters are scaled to 13 mm long, so they fit the clip's ~15 mm (FLOW+, COM2, RAIN)
+            linear_extrude(label_d + 0.01)
+                if (len(names[i]) >= 4) resize([13, 0], auto = true) text(names[i], size = 3, font = bold, valign = "center");
+                else text(names[i], size = 3.2, font = bold, valign = "center");
+}
+module clips_labels() {
+    clip_labels(strip12, strip12_labels);
+    translate([0, 40, 0]) clip_labels(strip5, strip5_labels);
+}
+
 // ── P2: the screen lid ────────────────────────────────────────────────────
 module lid() {
     lw = in_w - 0.6; lh = up_h - 0.6;
@@ -285,8 +324,7 @@ module lid() {
         // microphone, at the screen's left end
         // (from the front photo: 6.4 mm from the board's left edge, 9.7 mm from its top)
         translate([sx - scr_board[0] / 2 + 6.4, sy + scr_board[1] / 2 - 9.7, -1]) cylinder(d = 2.5, h = lid_t + 2);
-        // "IRRIGATION" (cut 0.6 mm: a colour change, or paint)
-        translate([18, lh - 20, lid_t - 0.6]) linear_extrude(1) text("IRRIGATION", size = 9, font = "Liberation Sans:style=Bold");
+        lid_label();   // inlay, 2nd colour
     }
 }
 
@@ -299,7 +337,7 @@ module wiring_cover() {
             for (x = [0, wiring_w - 0.6 - 2.6]) translate([x, 0, -1.6]) cube([2.6, lower_h - 0.3, 1.6]);
         }
         for (x = [1.3, wiring_w - 0.6 - 2.6 + 0.6]) translate([x - 0.1, -1, -1.7]) cube([1.4, lower_h + 2, 1.4]);
-        translate([12, lower_h / 2 - 5, cover_t - 0.6]) linear_extrude(1) text("Z1-Z8  COM  RAIN", size = 7, font = "Liberation Sans:style=Bold");
+        wiring_cover_label();   // inlays, 2nd colour (outside, and the wire colours inside)
         // a finger notch to slide it
         translate([(wiring_w - 0.6) / 2, 3, cover_t + 2.6]) scale([3, 1, 1]) sphere(d = 8);   // 1.4 mm deep
     }
@@ -311,28 +349,28 @@ module power_cover() {
             translate([0, -wall, -6]) cube([power_w - 0.6, wall, 6 + cover_t]);   // bends under the box
         }
         for (x = [15 - 0.3, power_w - 0.6 - 15 + 0.3]) translate([x, -wall - 1, -3]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = wall + 2);
-        translate([8, lower_h / 2 - 4, cover_t - 0.6]) linear_extrude(1) text("POWER", size = 7, font = "Liberation Sans:style=Bold");
+        power_cover_label();   // inlay, 2nd colour
     }
 }
 
 // ── P7: strip clips: cover the strip's upper row (the A8's pre-wired side), 2 screws ─
-module strip_clip(s) {
+module strip_clip(s, names) {
     tray = s[1] + 3.2;
     l = s[0] + 3.2 + 12 + 8;          // from boss to boss, plus ears
     difference() {
         union() {
             translate([-10, tray / 2 - 5, 0]) cube([l, 10, 2.4]);            // the screw bar
-            translate([-1, tray / 2, 0]) cube([s[0] + 5.2, tray / 2 + 1, 2.4]);  // over the upper row
+            translate([-1, tray / 2, 0]) cube([s[0] + 5.2, tray / 2 + 6, 2.4]);  // over the upper row, and 5 mm on (room for the names)
             // a lip down over the upper row's wire side, so the pre-wired leads can't be touched
             translate([-1, tray, -8]) cube([s[0] + 5.2, 1.6, 10.4]);
         }
         for (x = [-6, s[0] + 3.2 + 6]) translate([x, tray / 2, -1]) cylinder(d = 3.4, h = 5);
-        translate([s[0] / 2 - 20, tray / 2 + 2.5, 2.4 - 0.6]) linear_extrude(1) text("A8 SIDE", size = 4);
+        clip_labels(s, names);   // inlays, 2nd colour: each terminal's name
     }
 }
 module clips() {
-    strip_clip(strip12);
-    translate([0, 40, 0]) strip_clip(strip5);
+    strip_clip(strip12, strip12_labels);
+    translate([0, 40, 0]) strip_clip(strip5, strip5_labels);
 }
 
 // ── Test prints ───────────────────────────────────────────────────────────
@@ -436,3 +474,7 @@ else if (part == "test_inserts") test_inserts();
 else if (part == "test_base") test_base();
 else if (part == "test_fits") test_fits();
 else if (part == "clips") clips();
+else if (part == "lid_labels") lid_label();
+else if (part == "wiring_cover_labels") wiring_cover_label();
+else if (part == "power_cover_labels") power_cover_label();
+else if (part == "clips_labels") clips_labels();
