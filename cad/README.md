@@ -11,4 +11,4 @@ Parts: `box`, `base` (the A8's plate, wire channels on its back), `lid` (screen)
 `exploded`, `open` (covers off). STL output goes to `stl/` (not committed).
 
 Estimates still to check on the real parts: the screen's holes and thickness, the EVEPS height,
-the CPT's tabs, and which edge of the rail-mount plate is the relay edge (`a8_flip`).
+and the CPT's tabs.

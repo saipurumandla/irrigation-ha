@@ -35,8 +35,9 @@ a8_w = 152;         // over what sticks out, left-right
 a8_h = 110;         // top-bottom
 a8_margin = 3;      // from the left wall
 a8_bottom = 12;     // gap under the board (wires from the green blocks bend into the slot)
-// The board's 4 screws, from the plate's left / top (Grundplatte.stl). Which edge is the relay
-// edge in that model isn't certain: the test print checks it (flip with a8_flip = true).
+// The board's 4 screws, from the plate's left / top (Grundplatte.stl). The plate's straight-corner
+// edge (its "top" here, with the two corner holes) is the relay edge; the curved corners are the
+// green blocks' edge (the user, 2026-11-02). So relays up: a8_flip = false.
 a8_holes = [[13.6, 7.5], [139.1, 7.5], [42.4, 61.8], [68.9, 89.8]];
 a8_flip = false;
 standoff_d = 8;     // standoffs as in the rail-mount plate: the 2.4 mm clears the solder leads
