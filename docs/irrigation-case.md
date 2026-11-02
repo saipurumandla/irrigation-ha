@@ -154,6 +154,18 @@ Relay terminals (user, 2026-11-02): 24 screws 5.0 mm apart, the row centred alon
 edge (between the corner half holes), about 10.5 mm in from that edge; the orange block is flush
 with the edge (doesn't stick out); the board is 1.6 mm thick.
 
+**Other parts (2026-11-02):**
+- GUBCUB screw strip (seller's drawing): 12 positions 109.5 mm long, about 9.1 mm apart, 16.8 mm
+  deep (wire in to wire out), 14.0 mm to the top of the screw towers, base 7.9 mm, wire hole 2.5
+  mm; a mounting hole in the web between every two positions (M3). WIRING bay: the full 12
+  (about 110 mm); POWER bay: 5 positions (about 46 mm).
+- WAGO 221-413: about 18.7 x 18.6 x 8.3 mm (distributors' data); pockets 19.5 x 19.5 mm.
+- Glands (combo set), thread for the holes: PG7 12.5, PG9 15.2, PG11 18.6, PG13.5 20.4 mm.
+  Valve cable thickness still to measure (5-10 mm: PG11, 10-12 mm: PG13.5).
+- M3 heat-set inserts (a set): hole size from the test strip.
+- Still to measure on arrival: EVEPS and CPT converters, the screen; the wall space and the
+  distance to the outlet.
+
 **Decided 2026-11-02: no exact terminal positions.** Wires pass behind the board through one
 long slot along the relay edge and one along the green blocks' edge (not a hole per screw), so
 only the footprint, the 4 standoffs and the height (42 mm) have to be exact. The A8 is wired with
