@@ -172,7 +172,12 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
   10-28 V AC (check the transformer's no-load voltage first: the Rain Bird's read 28.8-29.3 V).
 - CPT C1205003 (seller's drawing): body 46 x 27 x 14 mm, slotted tabs at both short ends (about
   58 mm over them, to confirm), all four wires leave one long side, leads about 13.5 cm.
-- Still to measure on arrival: the EVEPS height, the screen; the wall space and the
+- Hosyond ESP32-S3 3.5" screen (seller's picture): board 100 x 54 mm, a mounting hole in each
+  corner about 3 mm in from the edges; the glass spans about 9.5-92 mm along the board, visible
+  area about 74 x 49 mm (lid window about 76 x 51 mm); mic hole on the left end; comes with a
+  speaker, an SH1.25-to-Dupont 4-wire cable (the A8 link) and USB-C. Thickness not given: 15 mm
+  until measured. Speaker grille in the lid: to decide.
+- Still to measure on arrival: the EVEPS height, the screen's thickness and hole size; the wall space and the
   distance to the outlet.
 
 **Decided 2026-11-02: no exact terminal positions.** Wires pass behind the board through one
