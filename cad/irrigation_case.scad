@@ -42,7 +42,7 @@ a8_holes = [[13.6, 7.5], [139.1, 7.5], [42.4, 61.8], [68.9, 89.8]];
 a8_flip = false;
 standoff_d = 8;     // standoffs as in the rail-mount plate: the 2.4 mm clears the solder leads
 standoff_h = 2.4;
-a8_screw_d = 2.0;   // self-tapping M2 / M2.5 into plastic
+a8_screw_d = 1.7;   // M2 screws (the user's), cutting their thread into the standoffs
 
 // ── The base plate behind the A8 (P6): wire channels on its back ─────────
 base_t = 10;
@@ -62,7 +62,7 @@ scr_holes = [92, 45];   // corner holes, centre to centre (measured 2026-11-02)
 scr_window = [76, 51];  // picture 73.4 x 49.0 (standard 3.5" 320 x 480), centred on the board
 scr_post_h = 4.4;       // the glass stands 4.07 mm above the board (5.67 with it, measured); 0.3 air
 scr_post_d = 6;
-scr_screw_d = 2.2;      // M2.5 self-tapping, through the board's 3 mm holes
+scr_screw_d = 1.7;      // M2 screws (the user's), through the board's 3 mm holes, cutting their thread
 scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y set below
 
 // ── Bays ──────────────────────────────────────────────────────────────────

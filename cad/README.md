@@ -13,3 +13,6 @@ lip up), and the test prints `test_inserts` (pick the heat-set insert hole) and 
 
 Estimates still to check on the real parts: the EVEPS height and the CPT's tabs. The screen is
 measured (holes 92 x 45 mm, 3 mm; glass 4.07 mm above the board).
+
+Screws: M3 with heat-set inserts for the base plate, lid, power cover and clips; M2 for the
+screen (its holes are 3 mm) and the A8, straight into the plastic (1.7 mm holes).
