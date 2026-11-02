@@ -76,6 +76,12 @@ pg7_d = 12.5;                  // transformer wire, under the power bay
 // plate, which has clearance holes over them), 2 low (in the bays).
 keyholes = [[20, H - 25], [W - 20, H - 25], [20, 30], [W - 20, 30]];
 
+// The base plate's 4 screws (base plate coordinates, from its bottom-left): clear of the channels,
+// slots and the A8's standoffs. Bosses on the box's back fit into recesses in the plate's back;
+// the heads sink into the plate's front (under the A8 there's only the 2.4 mm standoff gap).
+base_screws = [[28, 28], [130, 26], [28, 105], [125, 105]];
+base_boss_h = 7;
+
 // ── Derived ───────────────────────────────────────────────────────────────
 up_y0 = wall + lower_h + divider;          // floor of the A8 section
 up_h = H - wall - up_y0;                   // inside height of the A8 section
@@ -129,6 +135,8 @@ module box() {
             // the wiring cover slides down in grooves: rails on the left wall and the bay divider
             for (x = [wall, wall + wiring_w - 1.2])
                 translate([x, wall, D - cover_t - 2.4]) cube([1.2, lower_h, 1.2]);
+            // the base plate's 4 bosses (inserts at the top)
+            for (p = base_screws) translate([wall + 0.3 + p[0], up_y0 + 0.3 + p[1], back]) insert_boss(base_boss_h);
             // pockets: the converters, the Wagos, the terminal strips
             converter_pockets();
             bay_pockets();
@@ -226,6 +234,12 @@ module base() {
         sx = a8_x0 - wall + 6;
         translate([sx, a8_y0 - up_y0 + a8_h + 3, -1]) rcube([a8_w - 12, slot_w, base_t + 2], 3);
         translate([sx, a8_y0 - up_y0 - slot_w - 2, -1]) rcube([a8_w - 12, slot_w, base_t + 2], 3);
+        // the box's bosses fit into recesses on the back; M3 screws from the front, heads sunk
+        for (p = base_screws) translate([p[0], p[1], 0]) {
+            translate([0, 0, -1]) cylinder(d = boss_d + 0.6, h = base_boss_h + 1.3);
+            cylinder(d = 3.4, h = base_t + 1);
+            translate([0, 0, base_t - 3]) cylinder(d = 6.5, h = 4);
+        }
         // clearance for the 2 high keyholes' screw heads (the box is hung before the plate goes in)
         for (p = keyholes) if (p[1] > up_y0) translate([p[0] - wall - 0.3, p[1] - up_y0 - 0.3 + 5, -1]) cylinder(d = 14, h = base_t + 2);
         // the converters' wires through, and the screen cable
@@ -285,6 +299,26 @@ module power_cover() {
         for (x = [15, power_w - 0.6 - 15]) translate([x - (power_x0 - power_x0), -wall - 1, -3]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = wall + 2);
         translate([8, lower_h / 2 - 4, cover_t - 0.6]) linear_extrude(1) text("POWER", size = 7, font = "Liberation Sans:style=Bold");
     }
+}
+
+// ── P7: strip clips: cover the strip's upper row (the A8's pre-wired side), 2 screws ─
+module strip_clip(s) {
+    tray = s[1] + 3.2;
+    l = s[0] + 3.2 + 12 + 8;          // from boss to boss, plus ears
+    difference() {
+        union() {
+            translate([-10, tray / 2 - 5, 0]) cube([l, 10, 2.4]);            // the screw bar
+            translate([-1, tray / 2, 0]) cube([s[0] + 5.2, tray / 2 + 1, 2.4]);  // over the upper row
+            // a lip down over the upper row's wire side, so the pre-wired leads can't be touched
+            translate([-1, tray, -8]) cube([s[0] + 5.2, 1.6, 10.4]);
+        }
+        for (x = [-6, s[0] + 3.2 + 6]) translate([x, tray / 2, -1]) cylinder(d = 3.4, h = 5);
+        translate([s[0] / 2 - 20, tray / 2 + 2.5, 2.4 - 0.6]) linear_extrude(1) text("A8 SIDE", size = 4);
+    }
+}
+module clips() {
+    strip_clip(strip12);
+    translate([0, 40, 0]) strip_clip(strip5);
 }
 
 // ── Test prints ───────────────────────────────────────────────────────────
@@ -387,3 +421,4 @@ else if (part == "power_cover") power_cover();
 else if (part == "test_inserts") test_inserts();
 else if (part == "test_base") test_base();
 else if (part == "test_fits") test_fits();
+else if (part == "clips") clips();
