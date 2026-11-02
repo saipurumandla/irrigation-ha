@@ -166,7 +166,9 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
 - EVEPS EV36-A121203 (seller's drawing): 70 mm over its two slotted mounting tabs x 40 mm; height
   not given (about 20-22 mm, use 22 until measured); all four wires leave one long side; input
   10-28 V AC (check the transformer's no-load voltage first: the Rain Bird's read 28.8-29.3 V).
-- Still to measure on arrival: the EVEPS height, the CPT converter, the screen; the wall space and the
+- CPT C1205003 (seller's drawing): body 46 x 27 x 14 mm, slotted tabs at both short ends (about
+  58 mm over them, to confirm), all four wires leave one long side, leads about 13.5 cm.
+- Still to measure on arrival: the EVEPS height, the screen; the wall space and the
   distance to the outlet.
 
 **Decided 2026-11-02: no exact terminal positions.** Wires pass behind the board through one
