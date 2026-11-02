@@ -25,9 +25,10 @@ wiring_w = 125;     // inside width of the wiring bay (12-position strip: 109.5)
 lid_t = 2.4;        // screen lid thickness
 cover_t = 2.4;      // bay covers
 
-// Heat-set inserts (the user's: M3, 5 mm across, 4 and 6 mm long). The hole: from the test strip
-// (4.2 / 4.3 / 4.4 / 4.5). 6 mm ones where there's depth, 4 mm ones in the base plate's posts.
-ins_d = 4.3;
+// Heat-set inserts (the user's kit, its size chart: knurls 5.0, pilot collar 4.2, M3, L 4 and 6).
+// The hole is about the pilot (4.2), confirmed with the test strip (4.1 / 4.2 / 4.3 / 4.4).
+// 6 mm ones where there's depth, 4 mm ones in the base plate's posts.
+ins_d = 4.2;
 ins_depth = 6.5;        // M3 L6
 ins_depth_short = 4.5;  // M3 L4
 boss_d = 9;
@@ -336,7 +337,7 @@ module clips() {
 
 // ── Test prints ───────────────────────────────────────────────────────────
 module test_inserts() {   // pick the insert hole: melt one into each, keep the snug one
-    ds = [4.2, 4.3, 4.4, 4.5];
+    ds = [4.1, 4.2, 4.3, 4.4];
     difference() {
         cube([len(ds) * 14 + 4, 18, 8]);
         for (i = [0 : len(ds) - 1]) {
