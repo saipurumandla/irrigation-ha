@@ -61,8 +61,8 @@ scr_board = [101.5, 54.5];   // seller: 54.5 x 101.5 x 10 mm; 320 x 480 IPS, cap
 scr_holes = [92, 45];   // corner holes, centre to centre (measured 2026-11-02)
 scr_window = [76, 51];  // picture 73.4 x 49.0 (standard 3.5" 320 x 480), centred on the board
 scr_post_h = 4.4;       // the glass stands 4.07 mm above the board (5.67 with it, measured); 0.3 air
-scr_post_d = 6;
-scr_screw_d = 1.7;      // M2 screws (the user's), through the board's 3 mm holes, cutting their thread
+scr_post_d = 7;
+scr_screw_d = 2.7;      // M3 (passes the board's 3 mm holes, checked), cutting its thread into the post
 scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y set below
 
 // ── Bays ──────────────────────────────────────────────────────────────────
