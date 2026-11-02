@@ -25,10 +25,12 @@ wiring_w = 125;     // inside width of the wiring bay (12-position strip: 109.5)
 lid_t = 2.4;        // screen lid thickness
 cover_t = 2.4;      // bay covers
 
-// Heat-set inserts: the hole from the test strip (3.9 / 4.0 / 4.1 / 4.2), depth for M3 x 5.
-ins_d = 4.0;
-ins_depth = 5.5;
-boss_d = 8;
+// Heat-set inserts (the user's: M3, 5 mm across, 4 and 6 mm long). The hole: from the test strip
+// (4.2 / 4.3 / 4.4 / 4.5). 6 mm ones where there's depth, 4 mm ones in the base plate's posts.
+ins_d = 4.3;
+ins_depth = 6.5;        // M3 L6
+ins_depth_short = 4.5;  // M3 L4
+boss_d = 9;
 
 // ── The KC868-A8 (measured, and the rail-mount model's plate) ────────────
 a8_w = 152;         // over what sticks out, left-right
@@ -80,7 +82,7 @@ keyholes = [[20, H - 25], [W - 20, H - 25], [20, 30], [W - 20, 30]];
 // slots and the A8's standoffs. Bosses on the box's back fit into recesses in the plate's back;
 // the heads sink into the plate's front (under the A8 there's only the 2.4 mm standoff gap).
 base_screws = [[28, 28], [130, 26], [28, 105], [125, 105]];
-base_boss_h = 7;
+base_boss_h = 4;   // an L4 insert goes 0.5 mm on into the back wall; M3 x 8 from the plate's front
 
 // ── Derived ───────────────────────────────────────────────────────────────
 up_y0 = wall + lower_h + divider;          // floor of the A8 section
@@ -128,21 +130,24 @@ module box() {
             ledge();
             // inserts: the lid's 2 screws (from the wiring bay, up into the lid's bottom flange) and
             // the power cover's 2 screws (from underneath)
-            for (x = [wall + 30, wall + wiring_w - 30])
-                translate([x, wall + lower_h - 9, D - lid_t - 10]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = 12);
             for (x = [power_x0 + 15, W - wall - 15])
-                translate([x, wall, D - cover_t - 6]) rotate([-90, 0, 0]) insert_boss(10);
+                translate([x, wall, D - cover_t - 3]) rotate([-90, 0, 0]) cylinder(d = boss_d, h = 6);
             // the wiring cover slides down in grooves: rails on the left wall and the bay divider
             for (x = [wall, wall + wiring_w - 1.2])
                 translate([x, wall, D - cover_t - 2.4]) cube([1.2, lower_h, 1.2]);
             // the base plate's 4 bosses (inserts at the top)
-            for (p = base_screws) translate([wall + 0.3 + p[0], up_y0 + 0.3 + p[1], back]) insert_boss(base_boss_h);
+            for (p = base_screws) translate([wall + 0.3 + p[0], up_y0 + 0.3 + p[1], back]) cylinder(d = boss_d, h = base_boss_h);
             // pockets: the converters, the Wagos, the terminal strips
             converter_pockets();
             bay_pockets();
         }
+        // the base plate bosses' insert holes, on into the back wall (5.5 deep from the boss top)
+        for (p = base_screws) translate([wall + 0.3 + p[0], up_y0 + 0.3 + p[1], back + base_boss_h - ins_depth_short]) cylinder(d = ins_d, h = ins_depth_short + 0.1);
         // the wall hole: valve wires into the back of the wiring bay
         translate([wall + wiring_w / 2 - wall_hole[0] / 2, wall + 8, -1]) rcube([wall_hole[0], wall_hole[1], back + 2], 6);
+        // the power cover's 2 inserts, pressed in from under the box (M3 x 8 through the cover's lip)
+        for (x = [power_x0 + 15, W - wall - 15])
+            translate([x, -0.1, D - cover_t - 3]) rotate([-90, 0, 0]) cylinder(d = ins_d, h = ins_depth + 0.1);
         // the transformer's gland under the power bay
         translate([power_x0 + power_w - 18, -1, back + 22]) rotate([-90, 0, 0]) cylinder(d = pg7_d, h = wall + 2);
         // spare knockouts under the wiring bay (a 0.4 mm skin to punch out)
@@ -158,8 +163,8 @@ module box() {
         // the lid's 2 hooks go into these slots under the top wall
         for (x = [W / 2 - 50, W / 2 + 50]) translate([x - 8, H - wall - 0.5, D - lid_t - 4]) cube([16, 1.6, 4.2]);
         // screw holes for the lid (through the shelf front, from below)
-        for (x = [wall + 30, wall + wiring_w - 30])
-            translate([x, wall + lower_h - 10, D - lid_t - 10]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = 20);
+        for (x = [wall + 30.3, wall + wiring_w - 29.7])
+            translate([x, wall + lower_h - 1, D - lid_t - 6]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = divider + 2);
     }
 }
 module ledge() {   // inside the A8 section, 2.4 mm behind the front: the lid sits on it
@@ -238,7 +243,7 @@ module base() {
         for (p = base_screws) translate([p[0], p[1], 0]) {
             translate([0, 0, -1]) cylinder(d = boss_d + 0.6, h = base_boss_h + 1.3);
             cylinder(d = 3.4, h = base_t + 1);
-            translate([0, 0, base_t - 3]) cylinder(d = 6.5, h = 4);
+            translate([0, 0, base_t - 2.6]) cylinder(d = 6.5, h = 4);   // the head sinks in; 3.1 mm clamped
         }
         // clearance for the 2 high keyholes' screw heads (the box is hung before the plate goes in)
         for (p = keyholes) if (p[1] > up_y0) translate([p[0] - wall - 0.3, p[1] - up_y0 - 0.3 + 5, -1]) cylinder(d = 14, h = base_t + 2);
@@ -264,7 +269,11 @@ module lid() {
             for (x = [W / 2 - 50, W / 2 + 50]) translate([x - wall - 7.5, lh - 0.1, 0]) cube([15, 1.4, lid_t]);
             // the bottom flange with 2 insert holes (screwed from the wiring bay)
             translate([0, 0, -12]) cube([lw, 2.4, 12]);
-            for (x = [30, wiring_w - 30]) translate([x, 1.2, -10]) rotate([-90, 0, 0]) insert_boss(1.2);
+            // 2 posts up from the flange, the inserts pressed in from below (M3 x 8 up through the shelf)
+            for (x = [30, wiring_w - 30]) translate([x, 0, -6]) rotate([-90, 0, 0]) difference() {
+                cylinder(d = boss_d, h = 8);
+                translate([0, 0, -1]) cylinder(d = ins_d, h = ins_depth + 1);
+            }
         }
         // the screen screws' holes: through the posts and 1 mm into the lid (1.4 mm left in front),
         // so M3 x 5 or x 6 fits (board 1.6 + post 4.4 + 1)
@@ -300,7 +309,7 @@ module power_cover() {
             cube([power_w - 0.6, lower_h - 0.3, cover_t]);
             translate([0, -wall, -6]) cube([power_w - 0.6, wall, 6 + cover_t]);   // bends under the box
         }
-        for (x = [15, power_w - 0.6 - 15]) translate([x - (power_x0 - power_x0), -wall - 1, -3]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = wall + 2);
+        for (x = [15 - 0.3, power_w - 0.6 - 15 + 0.3]) translate([x, -wall - 1, -3]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = wall + 2);
         translate([8, lower_h / 2 - 4, cover_t - 0.6]) linear_extrude(1) text("POWER", size = 7, font = "Liberation Sans:style=Bold");
     }
 }
@@ -327,7 +336,7 @@ module clips() {
 
 // ── Test prints ───────────────────────────────────────────────────────────
 module test_inserts() {   // pick the insert hole: melt one into each, keep the snug one
-    ds = [3.9, 4.0, 4.1, 4.2];
+    ds = [4.2, 4.3, 4.4, 4.5];
     difference() {
         cube([len(ds) * 14 + 4, 18, 8]);
         for (i = [0 : len(ds) - 1]) {
