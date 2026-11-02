@@ -97,9 +97,13 @@ POWER side), screwed down through their own mounting holes. On each strip a smal
 
 - Vents: intake slots under the box, exhaust slots on top, louvres angled down so drips and dust
   can't fall in. Screen backlight off after 1 minute idle.
-- Cables enter **from below** through PG glands: valve cable on the left (PG11, or PG13.5 if the
-  cable is over 10 mm), transformer wire on the right (PG7), plus spare **knockouts** (thin
-  printed discs to pop out) on the bottom, back and outer sides. None on top.
+- The valve wires (18 AWG, loose) come **out of the wall** behind the controller (a punched hole the
+  Rain Bird sits over, size unknown): a **50 x 35 mm opening in the back of the WIRING bay**, rounded,
+  with a rim for a grommet or brush strip; any wall hole behind the bay lines up. No gland for them.
+- The transformer (bought, plugs into an outlet) comes from outside: its wire enters the **bottom
+  of the POWER bay** through a **PG7** gland.
+- Spare **knockouts** (thin printed discs to pop out) on the bottom for later cables (flow sensor).
+  None on top.
 - Transformer: printed **terminal clip** covers its two screws and holds the cable; the cable runs
   up the wall in paintable raceway. Wire: solid 18 AWG, hooked clockwise under the screws.
 
@@ -161,7 +165,7 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
   (about 110 mm); POWER bay: 5 positions (about 46 mm).
 - WAGO 221-413: about 18.7 x 18.6 x 8.3 mm (distributors' data); pockets 19.5 x 19.5 mm.
 - Glands (combo set), thread for the holes: PG7 12.5, PG9 15.2, PG11 18.6, PG13.5 20.4 mm.
-  Valve cable thickness still to measure (5-10 mm: PG11, 10-12 mm: PG13.5).
+  The valve wires come out of the wall into the back of the box (no gland for them).
 - M3 heat-set inserts (a set): hole size from the test strip.
 - EVEPS EV36-A121203 (seller's drawing): 70 mm over its two slotted mounting tabs x 40 mm; height
   not given (about 20-22 mm, use 22 until measured); all four wires leave one long side; input
