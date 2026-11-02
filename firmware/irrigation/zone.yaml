@@ -1,0 +1,128 @@
+# One zone (a relay and its settings), included once per relay from irrigation.yaml.
+# vars: n (1-8), pin (its relay on the expander, 0-7), name, enabled (RESTORE_DEFAULT_ON / _OFF)
+
+esphome:
+  on_boot:
+    priority: -100
+    then:
+      - lambda: |-
+          auto &z = irrigation::ctl().zones[${n} - 1];
+          z.relay = id(zone_${n}_relay);
+          z.control = id(zone_${n});
+          z.enabled = id(zone_${n}_enabled);
+          z.manual = id(zone_${n}_manual_minutes);
+          z.max = id(zone_${n}_max_minutes);
+          z.cycle = id(zone_${n}_cycle_minutes);
+          z.soak = id(zone_${n}_soak_minutes);
+          z.last_run = id(zone_${n}_last_run);
+          z.last_run_store = &id(zone_${n}_last_run_at);
+          if (id(zone_${n}_last_run_at)) id(zone_${n}_last_run).publish_state(irrigation::iso_utc(id(zone_${n}_last_run_at)));
+
+globals:
+  - id: zone_${n}_last_run_at
+    type: uint32_t
+    restore_value: true
+    initial_value: "0"
+
+switch:
+  # The relay: only the controller switches it, and it's always off after a restart.
+  - platform: gpio
+    id: zone_${n}_relay
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      pcf8574: relays
+      number: ${pin}
+      mode:
+        output: true
+      inverted: true
+
+  # In HA: on waters this zone for its "minutes by hand" (stopping anything else), off stops it.
+  - platform: template
+    id: zone_${n}
+    name: "${name}"
+    icon: mdi:sprinkler-variant
+    restore_mode: DISABLED  # its state comes from the controller; nothing to turn off at boot
+    turn_on_action:
+      - lambda: irrigation::ctl().run_zone(${n});
+    turn_off_action:
+      - lambda: irrigation::ctl().stop_zone(${n});
+
+  - platform: template
+    id: zone_${n}_enabled
+    name: "${name} enabled"
+    icon: mdi:check-circle-outline
+    entity_category: config
+    optimistic: true
+    restore_mode: ${enabled}
+    on_turn_on:
+      - lambda: irrigation::ctl().changed();
+    on_turn_off:
+      - lambda: irrigation::ctl().changed();
+
+number:
+  - platform: template
+    id: zone_${n}_manual_minutes
+    name: "${name} minutes by hand"
+    icon: mdi:timer-outline
+    entity_category: config
+    unit_of_measurement: min
+    mode: box
+    min_value: 1
+    max_value: 120
+    step: 1
+    initial_value: 10
+    optimistic: true
+    restore_value: true
+
+  - platform: template
+    id: zone_${n}_max_minutes
+    name: "${name} max minutes"
+    icon: mdi:timer-alert-outline
+    entity_category: config
+    unit_of_measurement: min
+    mode: box
+    min_value: 1
+    max_value: 240
+    step: 1
+    initial_value: 60
+    optimistic: true
+    restore_value: true
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  - platform: template
+    id: zone_${n}_cycle_minutes
+    name: "${name} cycle minutes"
+    icon: mdi:repeat
+    entity_category: config
+    unit_of_measurement: min
+    mode: box
+    min_value: 0
+    max_value: 60
+    step: 1
+    initial_value: 0
+    optimistic: true
+    restore_value: true
+
+  - platform: template
+    id: zone_${n}_soak_minutes
+    name: "${name} soak minutes"
+    icon: mdi:water-sync
+    entity_category: config
+    unit_of_measurement: min
+    mode: box
+    min_value: 0
+    max_value: 120
+    step: 1
+    initial_value: 0
+    optimistic: true
+    restore_value: true
+
+# A text timestamp: a float sensor would round the time to about two minutes.
+text_sensor:
+  - platform: template
+    id: zone_${n}_last_run
+    name: "${name} last run"
+    icon: mdi:history
+    device_class: timestamp
