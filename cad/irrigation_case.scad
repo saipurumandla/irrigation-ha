@@ -76,7 +76,8 @@ scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y 
 // ── Bays ──────────────────────────────────────────────────────────────────
 strip12 = [109.5, 16.8, 14];   // length, depth (wire in to out), height
 strip5 = [46, 16.8, 14];
-strip_play = 0.6;
+strip_play = 0.1;              // press fit: exact size was "a little tight, slid in" (PLA test)
+strip_tray_h = 5;              // tray: 1 mm floor + 4 mm of wall gripping the strip's 7.9 mm base
 wiring_hooks = [25, wiring_w - 25];   // x of the wiring cover's 2 hooks, from the bay's left side              // the strip was a little tight in the PLA test tray (exact size)
 wago = [18.7, 18.6, 8.3];
 wall_hole = [50, 35];          // valve wires out of the wall, into the back of the wiring bay
@@ -216,10 +217,10 @@ module strip_pocket(s) {   // a shallow tray; the printed clip (P7) holds the st
     c = strip_play;
     difference() {
         union() {
-            cube([s[0] + 3.2 + c, s[1] + 3.2 + c, 3]);
+            cube([s[0] + 3.2 + c, s[1] + 3.2 + c, strip_tray_h]);
             for (x = [-6, s[0] + 3.2 + c + 6]) translate([x, (s[1] + 3.2 + c) / 2, 0]) insert_boss(s[2] + 1);
         }
-        translate([1.6, 1.6, 1]) cube([s[0] + c, s[1] + c, 3]);
+        translate([1.6, 1.6, 1]) cube([s[0] + c, s[1] + c, strip_tray_h]);
     }
 }
 
