@@ -100,8 +100,8 @@ POWER side), screwed down through their own mounting holes. On each strip a smal
 
 ## Air and cables
 
-- Vents: intake slots under the box, exhaust slots on top, louvres angled down so drips and dust
-  can't fall in. Screen backlight off after 1 minute idle.
+- Vents: straight 3 mm slots: under the bays, low on both sides of the A8 section, and on top. No
+  louvres (decided 2026-11-02): the user adds a mesh inside if dust or insects get in. Screen backlight off after 1 minute idle.
 - The valve wires (18 AWG, loose) come **out of the wall** behind the controller (a punched hole the
   Rain Bird sits over, size unknown): a **50 x 35 mm opening in the back of the WIRING bay**, rounded,
   with a rim for a grommet or brush strip; any wall hole behind the bay lines up. No gland for them.
