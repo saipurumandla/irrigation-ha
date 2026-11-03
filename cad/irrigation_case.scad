@@ -45,7 +45,7 @@ a8_holes = [[13.6, 7.5], [139.1, 7.5], [42.4, 61.8], [68.9, 89.8]];
 a8_flip = false;
 standoff_d = 8;     // standoffs as in the rail-mount plate: the 2.4 mm clears the solder leads
 standoff_h = 2.4;
-a8_screw_d = 1.7;   // M2 screws (the user's), cutting their thread into the standoffs
+a8_screw_d = 2.7;   // M3 (pass the A8's holes freely, checked), cutting their thread into the standoffs and plate
 
 // ── The base plate behind the A8 (P6): wire channels on its back ─────────
 base_t = 10;

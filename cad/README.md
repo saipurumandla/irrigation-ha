@@ -28,4 +28,4 @@ Screws (M3 unless noted) and heat-set inserts (M3, 5 mm across: 8 x L6, 4 x L4; 
 - Lid: 2 x M3 x 8 up through the shelf from the wiring bay, into L6 inserts in its flange posts.
 - Power cover: 2 x M3 x 8 up through its lip, into L6 inserts under the box.
 - Strip clips: 4 x M3 x 8 into the strip trays' L6 inserts.
-- The A8: 4 x M2 into its standoffs (1.7 mm holes). Wall: 4 x #8 with anchors, through the keyholes.
+- The A8: 4 x M3 x 8 into its standoffs (2.7 mm holes, the screw cuts its thread). Wall: 4 x #8 with anchors, through the keyholes.
