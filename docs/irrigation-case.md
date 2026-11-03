@@ -160,7 +160,8 @@ not in the repo), which fits the board:**
   in about 42 mm above it. Enough for the planned 66 mm box.
 
 Test print (PLA, 2026-11-02): the A8's 4 holes line up with the standoffs, relays up. The terminal
-strip was a little tight in its tray (exact size): 0.6 mm of play added. Its holes
+strip was a little tight in its tray (exact size): 0.6 mm of play added. The PG7 gland fits its
+hole; the keyholes are fine (the user's screws fit). Its holes
 pass M3 freely, so it's screwed with M3 (the model uses only M3).
 
 Relay terminals (user, 2026-11-02): 24 screws 5.0 mm apart, the row centred along the relay
