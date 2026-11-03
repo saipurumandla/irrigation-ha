@@ -146,13 +146,19 @@ module box() {
             ledge();
             // inserts: the lid's 2 screws (from the wiring bay, up into the lid's bottom flange) and
             // the power cover's 2 screws (from underneath)
-            for (x = [power_x0 + 15, W - wall - 15])
+            for (x = [power_x0 + 15, W - wall - 15]) hull() {   // (45-degree slope under: no support)
                 translate([x, wall, D - cover_t - 3]) rotate([-90, 0, 0]) cylinder(d = boss_d, h = 6);
+                translate([x - boss_d / 2, wall, D - cover_t - 3 - boss_d / 2 - 6]) cube([boss_d, 0.01, 6 + boss_d / 2]);
+            }
             // the wiring cover rests on strips down both sides of the bay; it hooks into the shelf at the
             // top and a thumb screw holds it at the bottom (into this post, insert from the front)
             for (x = [wall, wall + wiring_w - 2.4])
                 translate([x, wall, D - cover_t - 1.6]) cube([2.4, lower_h, 1.6]);
-            translate([wall + wiring_w / 2 - 6, wall, D - cover_t - 10]) cube([12, 11, 10]);
+            // (a 45-degree slope under it, down the bottom wall: prints without support)
+            hull() {
+                translate([wall + wiring_w / 2 - 6, wall, D - cover_t - 10]) cube([12, 11, 10]);
+                translate([wall + wiring_w / 2 - 6, wall, D - cover_t - 21]) cube([12, 0.01, 11]);
+            }
             // the base plate's 4 bosses (inserts at the top)
             for (p = base_screws) translate([wall + 0.3 + p[0], up_y0 + 0.3 + p[1], back]) cylinder(d = boss_d, h = base_boss_h);
             // pockets: the terminal strips (the converters are on rails on the base plate)
@@ -189,10 +195,14 @@ module box() {
     }
 }
 module ledge() {   // inside the A8 section, 2.4 mm behind the front: the lid sits on it
-    t = 2;
-    translate([0, 0, D - lid_t - t]) difference() {
-        translate([wall, up_y0, 0]) cube([in_w, up_h, t]);
-        translate([wall + 3, up_y0 + 3, -1]) cube([in_w - 6, up_h - 6, t + 2]);
+    t = 2;      // the ledge itself
+    c = 3;      // a 45-degree slope under it (the box prints on its back: no support needed)
+    translate([0, 0, D - lid_t - t - c]) difference() {
+        translate([wall, up_y0, 0]) cube([in_w, up_h, t + c]);
+        hull() {
+            translate([wall, up_y0, -0.01]) cube([in_w, up_h, 0.01]);
+            translate([wall + 3, up_y0 + 3, c]) cube([in_w - 6, up_h - 6, t + 0.02]);
+        }
     }
 }
 module keyhole() {
@@ -338,9 +348,13 @@ module lid() {
             // the bottom flange with 2 insert holes (screwed from the wiring bay)
             translate([0, 0, -12]) cube([lw, 2.4, 12]);
             // 2 posts up from the flange, the inserts pressed in from below (M3 x 8 up through the shelf)
-            for (x = [30, wiring_w - 30]) translate([x, 0, -6]) rotate([-90, 0, 0]) difference() {
-                cylinder(d = boss_d, h = 8);
-                translate([0, 0, -1]) cylinder(d = ins_d, h = ins_depth + 1);
+            // (each post is filled down to the lid plate, so it prints without support)
+            for (x = [30, wiring_w - 30]) difference() {
+                hull() {
+                    translate([x, 0, -6]) rotate([-90, 0, 0]) cylinder(d = boss_d, h = 8);
+                    translate([x - boss_d / 2, 0, -0.01]) cube([boss_d, 8, 0.01]);
+                }
+                translate([x, -1, -6]) rotate([-90, 0, 0]) cylinder(d = ins_d, h = ins_depth + 1);
             }
         }
         // the screen screws' holes: through the posts and 1 mm into the lid (1.4 mm left in front),
@@ -366,10 +380,10 @@ module wiring_cover() {   // hooks at the top, a thumb screw at the bottom: open
     difference() {
         union() {
             chamfer_plate([wiring_w - 0.6, ch, cover_t], 1.5, 1);
-            // the 2 hooks: back 1.2 mm behind the shelf's lip, then up 3.5 mm into its slots
+            // the 2 hooks: back 1.2 mm behind the shelf's lip, then up 2.6 mm into its slots
             for (x = wiring_hooks) translate([x - 6, 0, 0]) {
                 translate([0, ch - 6, -3.0]) cube([12, 6, 3.0]);
-                translate([0, ch - 0.1, -3.0]) cube([12, 3.6, 1.6]);
+                translate([0, ch - 0.1, -3.0]) cube([12, 2.7, 1.6]);   // 2.6 mm: through the 2.4 mm shelf; short enough to print unsupported
             }
         }
         wiring_cover_label();   // inlays, 2nd colour (outside, and the wire colours inside)
