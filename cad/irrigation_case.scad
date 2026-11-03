@@ -76,7 +76,7 @@ scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y 
 // ── Bays ──────────────────────────────────────────────────────────────────
 strip12 = [109.5, 16.8, 14];   // length, depth (wire in to out), height
 strip5 = [46, 16.8, 14];
-strip_play = 0.1;
+strip_play = 0;                // exact size: the original tray, a snug press fit (0.1 looked loose to the user)
 clip_clamp = 0.6;              // the strip clip's posts are this much lower than the strip's top              // press fit: exact size was "a little tight, slid in" (PLA test)
 strip_tray_h = 3;              // tray: 1 mm floor + 2 mm wall (higher would cover the strip's wire holes)
 wiring_hooks = [25, wiring_w - 25];   // x of the wiring cover's 2 hooks, from the bay's left side              // the strip was a little tight in the PLA test tray (exact size)

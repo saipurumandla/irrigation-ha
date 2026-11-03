@@ -161,7 +161,8 @@ not in the repo), which fits the board:**
 
 Test print (PLA, 2026-11-02): the A8's 4 holes line up with the standoffs, relays up. The terminal
 strip was a little tight in its tray (exact size); the user wants a press fit so it can't wiggle:
-0.1 mm play, tray walls kept at 2 mm (higher covers the strip's wire holes), plus the clip. The PG7 gland fits its
+the original exact-size tray (0 play; 0.1 looked loose), walls 2 mm (higher covers the strip's
+wire holes), plus the clamping clip. The PG7 gland fits its
 hole; the keyholes are fine (the user's screws fit). Its holes
 pass M3 freely, so it's screwed with M3 (the model uses only M3).
 
