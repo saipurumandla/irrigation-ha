@@ -36,7 +36,7 @@ boss_d = 9;
 // ── The KC868-A8 (measured, and the rail-mount model's plate) ────────────
 a8_w = 152;         // over what sticks out, left-right
 a8_h = 110;         // top-bottom
-a8_margin = 3;      // from the left wall
+a8_margin = 1.5;    // from the left wall (tight: the converters need the width on the right)
 a8_bottom = 12;     // gap under the board (wires from the green blocks bend into the slot)
 // The board's 4 screws, from the plate's left / top (Grundplatte.stl). The plate's straight-corner
 // edge (its "top" here, with the two corner holes) is the relay edge; the curved corners are the
@@ -54,8 +54,8 @@ chan_w = 18;        // the ring channel around the board
 slot_w = 8;         // the long slots along the relay edge and the green blocks' edge
 
 // ── Converters, standing upright right of the A8 ─────────────────────────
-eveps = [40, 70, 22];   // w, h, height (height: to measure)
-cpt = [27, 58, 14];     // body 46 long + tabs (about 58 over them)
+eveps = [46.25, 70, 22];   // w (measured), h (seller), height (seller doesn't say; room to spare)
+cpt = [46.6, 58, 14];      // w (measured), h over the ears (estimate), height
 pocket_wall = 1.6;
 pocket_h = 6;
 
@@ -91,7 +91,7 @@ up_h = H - wall - up_y0;                   // inside height of the A8 section
 in_w = W - 2 * wall;
 a8_x0 = wall + a8_margin;
 a8_y0 = up_y0 + a8_bottom;
-conv_x0 = a8_x0 + a8_w + 3;                // the converter strip
+conv_x0 = a8_x0 + a8_w + 1.5;              // the converter strip
 conv_w = W - wall - conv_x0;
 power_x0 = wall + wiring_w + divider;
 power_w = W - wall - power_x0;
@@ -100,7 +100,7 @@ scr_y = a8_y0 + a8_h / 2 + 8;
 echo(str("box ", W, " x ", H, " x ", D, "; A8 section inside ", in_w, " x ", up_h,
          "; converter strip ", conv_w, " wide; wiring bay ", wiring_w, " x ", lower_h,
          "; power bay ", power_w, " x ", lower_h));
-assert(conv_w >= eveps[0] + 2 * pocket_wall, "the converter strip is narrower than the EVEPS");
+assert(conv_w >= max(eveps[0], cpt[0]) + 1, "the converter strip is narrower than the converters");
 assert(up_h >= a8_bottom + a8_h + 10, "the A8 section is too short");
 
 module rcube(s, r = 2) {  // a box with rounded vertical edges
