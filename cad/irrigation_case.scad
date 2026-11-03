@@ -76,6 +76,7 @@ scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y 
 // ── Bays ──────────────────────────────────────────────────────────────────
 strip12 = [109.5, 16.8, 14];   // length, depth (wire in to out), height
 strip5 = [46, 16.8, 14];
+strip_play = 0.6;              // the strip was a little tight in the PLA test tray (exact size)
 wago = [18.7, 18.6, 8.3];
 wall_hole = [50, 35];          // valve wires out of the wall, into the back of the wiring bay
 pg7_d = 12.5;                  // transformer wire, under the power bay
@@ -205,12 +206,13 @@ module bay_pockets() {
     translate([power_x0 + 4, wall + 8, back]) strip_pocket(strip5);
 }
 module strip_pocket(s) {   // a shallow tray; the printed clip (P7) holds the strip down with 2 screws
+    c = strip_play;
     difference() {
         union() {
-            cube([s[0] + 3.2, s[1] + 3.2, 3]);
-            for (x = [-6, s[0] + 3.2 + 6]) translate([x, (s[1] + 3.2) / 2, 0]) insert_boss(s[2] + 1);
+            cube([s[0] + 3.2 + c, s[1] + 3.2 + c, 3]);
+            for (x = [-6, s[0] + 3.2 + c + 6]) translate([x, (s[1] + 3.2 + c) / 2, 0]) insert_boss(s[2] + 1);
         }
-        translate([1.6, 1.6, 1]) cube([s[0], s[1], 3]);
+        translate([1.6, 1.6, 1]) cube([s[0] + c, s[1] + c, 3]);
     }
 }
 
@@ -281,7 +283,7 @@ module power_cover_label() {
 }
 module clip_labels(s, names) {   // one name beside each position, on the clip's top (upright text)
     pitch = s[0] / len(names);
-    tray = s[1] + 3.2;
+    tray = s[1] + 3.2 + strip_play;
     for (i = [0 : len(names) - 1])
         translate([1.6 + pitch * (i + 0.5), tray / 2 + 1.2, 2.4 - label_d]) rotate([0, 0, 90])
             // names of 4+ letters are scaled to 13 mm long, so they fit the clip's ~15 mm (FLOW+, COM2, RAIN)
@@ -355,8 +357,8 @@ module power_cover() {
 
 // ── P7: strip clips: cover the strip's upper row (the A8's pre-wired side), 2 screws ─
 module strip_clip(s, names) {
-    tray = s[1] + 3.2;
-    l = s[0] + 3.2 + 12 + 8;          // from boss to boss, plus ears
+    tray = s[1] + 3.2 + strip_play;
+    l = s[0] + 3.2 + strip_play + 12 + 8;          // from boss to boss, plus ears
     difference() {
         union() {
             translate([-10, tray / 2 - 5, 0]) cube([l, 10, 2.4]);            // the screw bar
@@ -364,7 +366,7 @@ module strip_clip(s, names) {
             // a lip down over the upper row's wire side, so the pre-wired leads can't be touched
             translate([-1, tray, -8]) cube([s[0] + 5.2, 1.6, 10.4]);
         }
-        for (x = [-6, s[0] + 3.2 + 6]) translate([x, tray / 2, -1]) cylinder(d = 3.4, h = 5);
+        for (x = [-6, s[0] + 3.2 + strip_play + 6]) translate([x, tray / 2, -1]) cylinder(d = 3.4, h = 5);
         clip_labels(s, names);   // inlays, 2nd colour: each terminal's name
     }
 }
