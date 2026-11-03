@@ -444,6 +444,12 @@ module test_fits() {   // the tight spots, on thin plates: converters, Wagos, st
     }
 }
 
+module test_screen() {   // the lid's screen corner (window, 4 posts, mic hole), face down, posts up
+    sx = scr_center[0] - wall; sy = scr_y - up_y0;
+    translate([0, 0, lid_t]) rotate([180, 0, 0]) translate([-sx, -sy, 0])
+        intersection() { lid(); translate([sx - 60, sy - 35, -10]) cube([120, 70, 20]); }
+}
+
 // ── Assembly preview ──────────────────────────────────────────────────────
 module assembly(explode = 0) {
     color("WhiteSmoke") box();
@@ -480,6 +486,7 @@ else if (part == "test_base") test_base();
 else if (part == "test_fits") test_fits();
 else if (part == "clips") clips();
 else if (part == "thumb_knob") thumb_knob();
+else if (part == "test_screen") test_screen();
 else if (part == "lid_labels") lid_label();
 else if (part == "wiring_cover_labels") wiring_cover_label();
 else if (part == "power_cover_labels") power_cover_label();
