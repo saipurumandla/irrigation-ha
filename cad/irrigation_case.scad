@@ -66,7 +66,7 @@ rail_top = 2.6;    // plastic over the channel
 
 // ── Screen (Hosyond ESP32-S3 3.5") in the lid ─────────────────────────────
 scr_board = [101.5, 54.5];   // seller: 54.5 x 101.5 x 10 mm; 320 x 480 IPS, capacitive
-scr_holes = [92, 45];   // corner holes, centre to centre (measured 2026-11-02)
+scr_holes = [89.7, 51.2];   // centre to centre: two cases made for this board agree (89.6 x 51.3, 90.0 x 50.9)
 scr_window = [76, 51];  // picture 73.4 x 49.0 (standard 3.5" 320 x 480), centred on the board
 scr_post_h = 3.5;       // the glass rests against the lid (4.4 left a gap over 0.8 mm in the test print)
 scr_post_d = 7;

@@ -186,7 +186,8 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
 - CPT C1205003 (seller's drawing): body 46 x 27 x 14 mm, slotted tabs at both short ends (about
   58 mm over them, to confirm), all four wires leave one long side, leads about 13.5 cm.
 - Hosyond screen, measured on arrival (2026-11-02): board 101.5 x 54.5 mm, 10 mm deep with the parts
-  behind; holes 92 x 45 mm centre to centre, 3 mm (M2.5 self-tapping into the lid's posts); 5.67 mm
+  behind; holes 89.7 x 51.2 mm centre to centre (from two published cases for this board; the hand-measured
+  92 x 45 was edge to edge and didn't line up), 3 mm (M2.5 self-tapping into the lid's posts); 5.67 mm
   board + glass (glass 4.07 above the board; the test print left a gap over 0.8 mm with 4.4 mm
   posts, so posts 3.5: the glass rests against the lid); picture 73.4 x 49.0 centred (window 76 x
   51). One socket, UART (5V GND TXD RXD), on the bottom edge carries the A8 link and its power;
