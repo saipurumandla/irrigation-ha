@@ -28,6 +28,8 @@ Screws (M3 unless noted) and heat-set inserts (M3, 5 mm across: 8 x L6, 4 x L4; 
 - Lid: 2 x M3 x 8 up through the shelf from the wiring bay, into L6 inserts in its flange posts.
 - Power cover: 2 x M3 x 8 up through its lip, into L6 inserts under the box.
 - Strip clips: 4 x M3 x 8 into the strip trays' L6 inserts.
+- Wiring cover: hooks into the shelf at the top; 1 x M3 x 10 socket screw pressed into the printed
+  `thumb_knob`, into an L6 insert at the bottom (opens by hand).
 - The A8: 4 x M3 x 8 into its standoffs (2.7 mm holes, the screw cuts its thread).
 - Converters (EVEPS, CPT): 4 x M3 x 10 + washers through their ears into M3 nuts slid into the
   nut rails on the base plate (any ear spacing). Wall: 4 x #8 with anchors, through the keyholes.

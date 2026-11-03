@@ -76,7 +76,8 @@ scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y 
 // ── Bays ──────────────────────────────────────────────────────────────────
 strip12 = [109.5, 16.8, 14];   // length, depth (wire in to out), height
 strip5 = [46, 16.8, 14];
-strip_play = 0.6;              // the strip was a little tight in the PLA test tray (exact size)
+strip_play = 0.6;
+wiring_hooks = [25, wiring_w - 25];   // x of the wiring cover's 2 hooks, from the bay's left side              // the strip was a little tight in the PLA test tray (exact size)
 wago = [18.7, 18.6, 8.3];
 wall_hole = [50, 35];          // valve wires out of the wall, into the back of the wiring bay
 pg7_d = 12.5;                  // transformer wire, under the power bay
@@ -139,9 +140,11 @@ module box() {
             // the power cover's 2 screws (from underneath)
             for (x = [power_x0 + 15, W - wall - 15])
                 translate([x, wall, D - cover_t - 3]) rotate([-90, 0, 0]) cylinder(d = boss_d, h = 6);
-            // the wiring cover slides down in grooves: rails on the left wall and the bay divider
-            for (x = [wall, wall + wiring_w - 1.2])
-                translate([x, wall, D - cover_t - 2.4]) cube([1.2, lower_h, 1.2]);
+            // the wiring cover rests on strips down both sides of the bay; it hooks into the shelf at the
+            // top and a thumb screw holds it at the bottom (into this post, insert from the front)
+            for (x = [wall, wall + wiring_w - 2.4])
+                translate([x, wall, D - cover_t - 1.6]) cube([2.4, lower_h, 1.6]);
+            translate([wall + wiring_w / 2 - 6, wall, D - cover_t - 10]) cube([12, 11, 10]);
             // the base plate's 4 bosses (inserts at the top)
             for (p = base_screws) translate([wall + 0.3 + p[0], up_y0 + 0.3 + p[1], back]) cylinder(d = boss_d, h = base_boss_h);
             // pockets: the terminal strips (the converters are on rails on the base plate)
@@ -154,6 +157,10 @@ module box() {
         // the power cover's 2 inserts, pressed in from under the box (M3 x 8 through the cover's lip)
         for (x = [power_x0 + 15, W - wall - 15])
             translate([x, -0.1, D - cover_t - 3]) rotate([-90, 0, 0]) cylinder(d = ins_d, h = ins_depth + 0.1);
+        // the wiring cover: its 2 hooks go up into these slots in the shelf (1.2 mm lip in front), and
+        // the thumb screw's insert (L6, pressed in from the front)
+        for (x = wiring_hooks) translate([wall + x - 6.5, wall + lower_h - 1, D - cover_t - 3.2]) cube([13, divider + 2, 2.0]);
+        translate([wall + wiring_w / 2, wall + 5.5, D - cover_t - ins_depth]) cylinder(d = ins_d, h = ins_depth + 0.1);
         // the transformer's gland under the power bay
         translate([power_x0 + power_w - 18, -1, back + 22]) rotate([-90, 0, 0]) cylinder(d = pg7_d, h = wall + 2);
         // spare knockouts under the wiring bay (a 0.4 mm skin to punch out)
@@ -331,17 +338,28 @@ module lid() {
 }
 
 // ── P3: wiring cover (slides down), P4: power cover (2 screws underneath) ─
-module wiring_cover() {
+module wiring_cover() {   // hooks at the top, a thumb screw at the bottom: opens by hand
+    ch = lower_h - 0.3;
     difference() {
         union() {
-            cube([wiring_w - 0.6, lower_h - 0.3, cover_t]);
-            // the grooves ride on the box's rails
-            for (x = [0, wiring_w - 0.6 - 2.6]) translate([x, 0, -1.6]) cube([2.6, lower_h - 0.3, 1.6]);
+            cube([wiring_w - 0.6, ch, cover_t]);
+            // the 2 hooks: back 1.2 mm behind the shelf's lip, then up 3.5 mm into its slots
+            for (x = wiring_hooks) translate([x - 6, 0, 0]) {
+                translate([0, ch - 6, -3.0]) cube([12, 6, 3.0]);
+                translate([0, ch - 0.1, -3.0]) cube([12, 3.6, 1.6]);
+            }
         }
-        for (x = [1.3, wiring_w - 0.6 - 2.6 + 0.6]) translate([x - 0.1, -1, -1.7]) cube([1.4, lower_h + 2, 1.4]);
         wiring_cover_label();   // inlays, 2nd colour (outside, and the wire colours inside)
-        // a finger notch to slide it
-        translate([(wiring_w - 0.6) / 2, 3, cover_t + 2.6]) scale([3, 1, 1]) sphere(d = 8);   // 1.4 mm deep
+        // the thumb screw (M3 x 10 in the printed knob)
+        translate([wiring_w / 2, 5.5, -1]) cylinder(d = 3.4, h = cover_t + 2);
+    }
+}
+module thumb_knob() {   // an M3 x 10 socket screw pressed in head first: turn by hand
+    difference() {
+        cylinder(d = 18, h = 6, $fn = 60);
+        for (i = [0 : 11]) rotate([0, 0, i * 30]) translate([9.6, 0, -1]) cylinder(d = 3, h = 8);   // grip
+        translate([0, 0, -1]) cylinder(d = 3.4, h = 8);
+        translate([0, 0, 6 - 3.2]) cylinder(d = 5.7, h = 4);   // the screw head, pressed in
     }
 }
 module power_cover() {
@@ -419,15 +437,6 @@ module test_fits() {   // the tight spots, on thin plates: converters, Wagos, st
         cube([24, 30, back]);
         translate([12, 7, 0]) keyhole();
     }
-    // the wiring cover's slide: a rail on a wall stub, and a cover piece that rides on it
-    translate([120, eveps[1] + 14, 0]) {
-        cube([30, 4, 14]);                                        // wall stub, standing
-        translate([0, 4, 14 - cover_t - 2.4]) cube([30, 1.2, 1.2]);   // the rail, as in the box
-    }
-    translate([120, eveps[1] + 24, 0]) difference() {           // a cover piece, printed flat
-        union() { cube([30, 20, cover_t]); translate([0, 0, cover_t]) cube([30, 2.6, 1.6]); }
-        translate([-1, 1.3 - 0.1, cover_t - 0.1]) cube([32, 1.4, 1.4]);
-    }
 }
 
 // ── Assembly preview ──────────────────────────────────────────────────────
@@ -465,6 +474,7 @@ else if (part == "test_inserts") test_inserts();
 else if (part == "test_base") test_base();
 else if (part == "test_fits") test_fits();
 else if (part == "clips") clips();
+else if (part == "thumb_knob") thumb_knob();
 else if (part == "lid_labels") lid_label();
 else if (part == "wiring_cover_labels") wiring_cover_label();
 else if (part == "power_cover_labels") power_cover_label();
