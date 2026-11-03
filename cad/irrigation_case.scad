@@ -56,8 +56,13 @@ slot_w = 8;         // the long slots along the relay edge and the green blocks'
 // ── Converters, standing upright right of the A8 ─────────────────────────
 eveps = [46.25, 70, 22];   // w (measured), h (seller), height (seller doesn't say; room to spare)
 cpt = [46.6, 58, 14];      // w (measured), h over the ears (estimate), height
-pocket_wall = 1.6;
-pocket_h = 6;
+// Converter mounting: a nut rail under each one (slot on top, M3 nuts slide in the channel below,
+// held from turning), so the screws land wherever the ears are. M3 x 10 + washer through each ear.
+rail_w = 12;
+rail_h = 6;
+nut_w = 6.2;       // M3 nut: 5.5 across flats, 6.35 across corners (so it can't turn)
+nut_ch = 2.8;      // channel height (nut 2.4)
+rail_top = 2.6;    // plastic over the channel
 
 // ── Screen (Hosyond ESP32-S3 3.5") in the lid ─────────────────────────────
 scr_board = [101.5, 54.5];   // seller: 54.5 x 101.5 x 10 mm; 320 x 480 IPS, capacitive
@@ -138,8 +143,7 @@ module box() {
                 translate([x, wall, D - cover_t - 2.4]) cube([1.2, lower_h, 1.2]);
             // the base plate's 4 bosses (inserts at the top)
             for (p = base_screws) translate([wall + 0.3 + p[0], up_y0 + 0.3 + p[1], back]) cylinder(d = boss_d, h = base_boss_h);
-            // pockets: the converters, the Wagos, the terminal strips
-            converter_pockets();
+            // pockets: the terminal strips (the converters are on rails on the base plate)
             bay_pockets();
         }
         // the base plate bosses' insert holes, on into the back wall (5.5 deep from the boss top)
@@ -180,19 +184,18 @@ module keyhole() {
     translate([-2.25, 0, 0]) cube([4.5, 10, back + 2]);
     translate([0, 10, 0]) cylinder(d = 4.5, h = back + 2);
 }
-module converter_pockets() {   // low walls the converters drop into (a strap or tie holds them)
-    z = back + base_t;
-    ex = conv_x0 + (conv_w - eveps[0]) / 2;
-    translate([ex - pocket_wall, H - wall - 4 - eveps[1] - pocket_wall, z]) pocket(eveps);
-    translate([conv_x0 + (conv_w - cpt[0]) / 2 - pocket_wall, up_y0 + 4 - pocket_wall, z]) pocket(cpt);
-}
-module pocket(s) {
+module nut_rail(l) {   // along y; nuts go in at either end
     difference() {
-        cube([s[0] + 2 * pocket_wall, s[1] + 2 * pocket_wall, pocket_h]);
-        translate([pocket_wall, pocket_wall, -1]) cube([s[0] + 0.5, s[1] + 0.5, pocket_h + 2]);
-        // a slot each side for a strap or cable tie
-        translate([-1, s[1] / 2 - 2, 2]) cube([s[0] + 2 * pocket_wall + 2, 5, 2.5]);
+        translate([-rail_w / 2, 0, 0]) cube([rail_w, l, rail_h]);
+        translate([-1.7, -1, rail_h - rail_top - 0.1]) cube([3.4, l + 2, rail_top + 1]);          // the slot
+        translate([-nut_w / 2, -1, rail_h - rail_top - nut_ch]) cube([nut_w, l + 2, nut_ch]);      // the nut channel
     }
+}
+// the two rails, in base plate coordinates: EVEPS above, CPT below, along the strip's middle
+module converter_rails() {
+    cx = conv_x0 - wall - 0.3 + conv_w / 2;
+    translate([cx, (H - wall - 4 - eveps[1]) - up_y0 - 0.3 - 1, base_t]) nut_rail(eveps[1] + 2);
+    translate([cx, 4 - 0.3 - 1, base_t]) nut_rail(cpt[1] + 2);
 }
 module bay_pockets() {
     // wiring bay: the 12-strip lies across, its screws to the front, above the wall hole
@@ -219,6 +222,8 @@ module base() {
             cube([bw, bh, base_t]);
             // the 4 standoffs
             for (p = a8_holes) translate(a8_hole_xy(p)) translate([0, 0, base_t]) cylinder(d = standoff_d, h = standoff_h);
+            // the converters' nut rails
+            converter_rails();
         }
         for (p = a8_holes) translate(a8_hole_xy(p)) translate([0, 0, 2]) cylinder(d = a8_screw_d, h = base_t + standoff_h);
         // the ring channel on the back, round the board
@@ -395,18 +400,9 @@ module test_base() {   // a thin plate with the 4 standoffs: put the real A8 on 
 
 module test_fits() {   // the tight spots, on thin plates: converters, Wagos, strip tray, gland, rail, keyhole
     f = 1.2;   // floor
-    // converters: their pockets as in the box
-    cube([eveps[0] + 2 * pocket_wall + 4, eveps[1] + 2 * pocket_wall + 4, f]);
-    translate([2, 2, f]) pocket(eveps);
-    translate([eveps[0] + 12, 0, 0]) { cube([cpt[0] + 2 * pocket_wall + 4, cpt[1] + 2 * pocket_wall + 4, f]); translate([2, 2, f]) pocket(cpt); }
-    // Wagos 2 x 2
-    translate([eveps[0] + cpt[0] + 22, 0, 0]) {
-        cube([2 * (wago[0] + 2.4) + 4, 2 * (wago[1] + 2.4) + 4, f]);
-        translate([1, 1, f]) for (i = [0, 1], j = [0, 1]) translate([i * (wago[0] + 2.4), j * (wago[1] + 2.4), 0]) difference() {
-            cube([wago[0] + 3.2, wago[1] + 3.2, 4]);
-            translate([1.6, 1.6, 1]) cube([wago[0] + 0.4, wago[1] + 0.4, 4]);
-        }
-    }
+    // converters: a 50 mm piece of nut rail on a plate (slide 2 nuts in, screw an ear down)
+    cube([30, 54, f]);
+    translate([15, 2, f]) nut_rail(50);
     // the terminal strip tray: its first 30 mm and the insert post
     translate([0, eveps[1] + 14, 0]) {
         translate([-8, 0, 0]) cube([46, strip12[1] + 7, f]);
@@ -438,8 +434,8 @@ module assembly(explode = 0) {
     color("LightSteelBlue") translate([wall + 0.3, up_y0 + 0.3, back]) base();
     color("ForestGreen", 0.8) translate([a8_x0, a8_y0, back + base_t + standoff_h]) cube([a8_w, a8_h, 1.6]);
     color("DarkOrange") translate([a8_x0 + 6, a8_y0 + a8_h - 10, back + base_t + standoff_h + 1.6]) cube([a8_w - 12, 10, 14]);
-    color("Black") translate([conv_x0 + (conv_w - eveps[0]) / 2, H - wall - 4 - eveps[1], back + base_t]) cube(eveps);
-    color("Black") translate([conv_x0 + (conv_w - cpt[0]) / 2, up_y0 + 4, back + base_t]) cube(cpt);
+    color("Black") translate([conv_x0 + (conv_w - eveps[0]) / 2, H - wall - 4 - eveps[1], back + base_t + rail_h]) cube(eveps);
+    color("Black") translate([conv_x0 + (conv_w - cpt[0]) / 2, up_y0 + 4, back + base_t + rail_h]) cube(cpt);
     color("Gainsboro", 0.9) translate([wall + 0.3, up_y0 + 0.3, D - lid_t + explode]) lid();
     color("Gainsboro") translate([wall + 0.3, wall, D - cover_t + explode]) wiring_cover();
     color("Gainsboro") translate([power_x0 + 0.3, wall, D - cover_t + explode]) power_cover();
@@ -450,12 +446,10 @@ module open_view() {   // covers off: what's inside
     color("LightSteelBlue") translate([wall + 0.3, up_y0 + 0.3, back]) base();
     color("ForestGreen", 0.8) translate([a8_x0, a8_y0, back + base_t + standoff_h]) cube([a8_w, a8_h, 1.6]);
     color("DarkOrange") translate([a8_x0 + 6, a8_y0 + a8_h - 10, back + base_t + standoff_h + 1.6]) cube([a8_w - 12, 10, 14]);
-    color("Black") translate([conv_x0 + (conv_w - eveps[0]) / 2, H - wall - 4 - eveps[1], back + base_t]) cube(eveps);
-    color("Black") translate([conv_x0 + (conv_w - cpt[0]) / 2, up_y0 + 4, back + base_t]) cube(cpt);
+    color("Black") translate([conv_x0 + (conv_w - eveps[0]) / 2, H - wall - 4 - eveps[1], back + base_t + rail_h]) cube(eveps);
+    color("Black") translate([conv_x0 + (conv_w - cpt[0]) / 2, up_y0 + 4, back + base_t + rail_h]) cube(cpt);
     color("White") translate([wall + (wiring_w - strip12[0]) / 2, wall + lower_h - strip12[1] - 14 + 1.6, back + 1]) cube(strip12);
     color("White") translate([power_x0 + 4 + 1.6, wall + 8 + 1.6, back + 1]) cube(strip5);
-    color("Orange") translate([power_x0 + 4, wall + lower_h - 2 * (wago[1] + 1) - 6, back + 1]) for (i = [0, 1], j = [0, 1])
-        translate([1.6 + i * (wago[0] + 2.4), 1.6 + j * (wago[1] + 2.4), 0]) cube(wago);
 }
 if (part == "assembly") assembly(0);
 else if (part == "open") open_view();
