@@ -112,6 +112,12 @@ echo(str("box ", W, " x ", H, " x ", D, "; A8 section inside ", in_w, " x ", up_
 assert(conv_w >= max(eveps[0], cpt[0]) + 1, "the converter strip is narrower than the converters");
 assert(up_h >= a8_bottom + a8_h + 10, "the A8 section is too short");
 
+module chamfer_plate(s, r = 2, c = 1) {   // a plate whose front (top) edges are chamfered c
+    hull() {
+        rcube([s[0], s[1], s[2] - c], r);
+        translate([c, c, 0]) rcube([s[0] - 2 * c, s[1] - 2 * c, s[2]], max(r - c, 0.5));
+    }
+}
 module rcube(s, r = 2) {  // a box with rounded vertical edges
     hull() for (x = [r, s[0] - r], y = [r, s[1] - r]) translate([x, y, 0]) cylinder(r = r, h = s[2]);
 }
@@ -268,30 +274,39 @@ module base() {
 }
 function a8_hole_xy(p) = [a8_x0 - wall + p[0], (a8_y0 - up_y0) + (a8_flip ? p[1] : a8_h - p[1])];
 
-// ── Labels (2nd colour) ────────────────────────────────────────────────────
-// Each label is cut 0.6 mm (3 layers) into its part and printed as an inlay in the second
-// colour: load the part and its *_labels STL together in OrcaSlicer as one object (parts), and
-// give the labels the 2nd filament. The parts print face down, so the colour is only in their
-// first (or, for the inside of the wiring cover, last) 3 layers.
+// ── Etching (one colour) ───────────────────────────────────────────────────
+// Everything is etched 0.6 mm into its part, the same colour (decided 2026-11-02): outside only a
+// water drop and a line framing the screen, no words; inside, the terminal names on the clips and
+// the valve wire colours in the wiring cover. (The *_labels parts are the same shapes, should a
+// second colour ever be wanted.)
 label_d = 0.6;
 bold = "Liberation Sans:style=Bold";
 wire_colours = ["Z1 red", "Z2 blue", "Z3 yellow", "Z4 green", "Z5 black", "COM white"];
 strip12_labels = ["Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "COM", "COM2", "RAIN", "RAIN"];
 strip5_labels = ["24V", "0V", "FLOW+", "SIG", "GND"];
 
-module lid_label() {
-    translate([18, up_h - 0.6 - 20, lid_t - label_d]) linear_extrude(label_d + 0.01) text("IRRIGATION", size = 9, font = bold);
+// The front: no words, just a water drop on the lid and a dark bezel round the screen.
+module drop_2d(h = 18) {   // a water drop, point up, h tall
+    r = h * 0.32;
+    hull() { circle(r = r, $fn = 64); translate([0, h - r - 0.6]) circle(r = 0.6, $fn = 16); }
 }
-module wiring_cover_label() {
-    translate([12, lower_h / 2 + 8, cover_t - label_d]) linear_extrude(label_d + 0.01) text("Z1-Z8  COM  RAIN", size = 7, font = bold);
+module lid_label() {
+    sx = scr_center[0] - wall; sy = scr_y - up_y0;
+    // the logo, centred in the plain part of the lid left of the screen
+    translate([(sx - scr_board[0] / 2) / 2, sy - 7, lid_t - label_d]) linear_extrude(label_d + 0.01) drop_2d(18);
+    // a thin etched line framing the window, 5 mm out
+    translate([sx, sy, lid_t - label_d]) linear_extrude(label_d + 0.01) difference() {
+        offset(r = 5.4) square(scr_window, center = true);
+        offset(r = 4.6) square(scr_window, center = true);
+    }
+}
+module wiring_cover_label() {   // nothing outside; inside, which valve wire is which
     // inside: which valve wire is which (read from inside, so mirrored)
     for (i = [0 : len(wire_colours) - 1])
         translate([wiring_w - 0.6 - 14 - (i % 3) * 36, 22 - floor(i / 3) * 9, 0]) mirror([1, 0, 0])
             linear_extrude(label_d + 0.01) text(wire_colours[i], size = 4.5, font = bold);
 }
-module power_cover_label() {
-    translate([8, lower_h / 2 - 4, cover_t - label_d]) linear_extrude(label_d + 0.01) text("POWER", size = 7, font = bold);
-}
+module power_cover_label() { }   // plain (no words on the front)
 module clip_labels(s, names) {   // one name beside each position, on the clip's top (upright text)
     pitch = s[0] / len(names);
     tray = s[1] + 3.2 + strip_play;
@@ -313,7 +328,7 @@ module lid() {
     sx = scr_center[0] - wall; sy = scr_y - up_y0;
     difference() {
         union() {
-            rcube([lw, lh, lid_t], 2);
+            chamfer_plate([lw, lh, lid_t], 2, 1);
             // the screen's 4 posts (behind the lid, toward the A8)
             for (dx = [-1, 1], dy = [-1, 1])
                 translate([sx + dx * scr_holes[0] / 2, sy + dy * scr_holes[1] / 2, -scr_post_h])
@@ -333,7 +348,11 @@ module lid() {
         for (dx = [-1, 1], dy = [-1, 1])
             translate([sx + dx * scr_holes[0] / 2, sy + dy * scr_holes[1] / 2, -scr_post_h - 1]) cylinder(d = scr_screw_d, h = scr_post_h + 2);
         // the window
-        translate([sx - scr_window[0] / 2, sy - scr_window[1] / 2, -1]) rcube([scr_window[0], scr_window[1], lid_t + 2], 2);
+        translate([sx, sy, 0]) hull() {
+            translate([0, 0, -1]) linear_extrude(0.01) offset(r = 1.5) offset(delta = -1.5) square(scr_window, center = true);
+            translate([0, 0, lid_t - 1]) linear_extrude(0.01) offset(r = 1.5) offset(delta = -1.5) square(scr_window, center = true);
+            translate([0, 0, lid_t + 0.01]) linear_extrude(0.01) offset(r = 2.5) offset(delta = -1.5) square(scr_window + [2, 2], center = true);
+        }
         // microphone, at the screen's left end
         // (from the front photo: 6.4 mm from the board's left edge, 9.7 mm from its top)
         translate([sx - scr_board[0] / 2 + 6.4, sy + scr_board[1] / 2 - 9.7, -1]) cylinder(d = 2.5, h = lid_t + 2);
@@ -346,7 +365,7 @@ module wiring_cover() {   // hooks at the top, a thumb screw at the bottom: open
     ch = lower_h - 0.3;
     difference() {
         union() {
-            cube([wiring_w - 0.6, ch, cover_t]);
+            chamfer_plate([wiring_w - 0.6, ch, cover_t], 1.5, 1);
             // the 2 hooks: back 1.2 mm behind the shelf's lip, then up 3.5 mm into its slots
             for (x = wiring_hooks) translate([x - 6, 0, 0]) {
                 translate([0, ch - 6, -3.0]) cube([12, 6, 3.0]);
@@ -369,7 +388,7 @@ module thumb_knob() {   // an M3 x 10 socket screw pressed in head first: turn b
 module power_cover() {
     difference() {
         union() {
-            cube([power_w - 0.6, lower_h - 0.3, cover_t]);
+            chamfer_plate([power_w - 0.6, lower_h - 0.3, cover_t], 1.5, 1);
             translate([0, -wall, -6]) cube([power_w - 0.6, wall, 6 + cover_t]);   // bends under the box
         }
         for (x = [15 - 0.3, power_w - 0.6 - 15 + 0.3]) translate([x, -wall - 1, -3]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = wall + 2);

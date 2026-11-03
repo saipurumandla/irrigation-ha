@@ -11,12 +11,9 @@ lip up), and the test prints `test_inserts` (pick the heat-set insert hole) and 
 (the A8's 4 standoffs on a thin plate: check the fit before the box). Previews: `assembly`,
 `exploded`, `open` (covers off). STL output goes to `stl/` (not committed).
 
-Two colours (beige PETG + a dark PETG for the labels): `lid`, `wiring_cover`, `power_cover` and
-`clips` have their labels cut 0.6 mm in; `lid_labels`, `wiring_cover_labels`, `power_cover_labels`
-and `clips_labels` are the inlays. In OrcaSlicer load a part and its labels together as one object
-(it asks: "multi-part object" -> yes) and give the labels the 2nd filament. The labels: IRRIGATION,
-Z1-Z8 COM RAIN, POWER outside; each terminal's name on the clips; the valve wire colours inside the
-wiring cover.
+One colour. The front has no words: a water drop etched into the lid and an etched line framing
+the screen; edges and the window are chamfered. Inside, the terminal names (clips) and the valve
+wire colours (wiring cover) are etched too.
 
 Estimates still to check on the real parts: the EVEPS height and the CPT's tabs. The screen is
 measured (holes 92 x 45 mm, 3 mm; glass 4.07 mm above the board).
