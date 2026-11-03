@@ -210,6 +210,23 @@ the lid open; anything can be changed later by opening it.
 4. Converters and the Centropower's bottom end (width × depth, screw spacing): measured on arrival.
 5. Valve cable thickness (gland size).
 
+## Where it stands (2026-11-02)
+
+Modelled in `cad/irrigation-case/` (OpenSCAD; README there lists parts and screws). Test prints:
+- PLA: the A8's standoffs line up (relays up); the terminal strip fits its tray (now a 0.1 mm press
+  fit, 2 mm walls); the PG7 gland fits; keyholes fine.
+- PETG, printing 2026-11-02 (`test_inserts` 4.1-4.4 + `test_fits` with a nut-rail piece): still to
+  check.
+
+**Next:**
+1. When the PETG test is done: which insert hole (4.1 / 4.2 / 4.3 / 4.4) holds an L6 best (iron
+   about 240 C), and whether the nut rail works (2 M3 nuts slide in without turning, an M3 x 10 +
+   washer through a converter's ear holds it).
+2. Then: set `ins_d` to the winner, export the final parts (box, base, lid, wiring and power covers,
+   clips, thumb knob, and the label inlays), slice them in PETG with `scripts/orca-slice.py`
+   (time and grams), and copy them to a USB stick (the printer has LAN mode, but OrcaSlicer can't
+   send to Anycubic; sending from here would be our own project).
+
 ## Steps
 
 1. Measure (above). 2. Model in OpenSCAD (parametric) and send a preview. 3. Print the insert test
