@@ -284,10 +284,11 @@ module base() {
 }
 function a8_hole_xy(p) = [a8_x0 - wall + p[0], (a8_y0 - up_y0) + (a8_flip ? p[1] : a8_h - p[1])];
 
-// ── Etching (one colour) ───────────────────────────────────────────────────
-// Everything is etched 0.6 mm into its part, the same colour (decided 2026-11-02): outside only a
-// water drop and a line framing the screen, no words; inside, only the terminal names on the clips. (The *_labels parts are the same shapes, should a
-// second colour ever be wanted.)
+// ── Black inlays (2nd colour) ──────────────────────────────────────────────
+// Outside, no words: a water drop on the lid and a 1.2 mm line framing the screen; inside, the
+// terminal names on the strip clips. Each is cut 0.6 mm (3 layers) into its part, and the *_labels
+// part (the same shapes) prints in black in that cut, side by side, no overlap: the lid's in its
+// first 3 layers (face down), the clips' in their top 3 (names up, flat clips without the lip).
 label_d = 0.6;
 bold = "Liberation Sans:style=Bold";
 wire_colours = ["Z1 red", "Z2 blue", "Z3 yellow", "Z4 green", "Z5 black", "COM white"];
@@ -305,8 +306,8 @@ module lid_label() {
     translate([(sx - scr_board[0] / 2) / 2, sy - 7, lid_t - label_d]) linear_extrude(label_d + 0.01) drop_2d(18);
     // a thin etched line framing the window, 5 mm out
     translate([sx, sy, lid_t - label_d]) linear_extrude(label_d + 0.01) difference() {
-        offset(r = 5.4) square(scr_window, center = true);
-        offset(r = 4.6) square(scr_window, center = true);
+        offset(r = 5.6) square(scr_window, center = true);   // 1.2 mm wide: prints clean as an inlay
+        offset(r = 4.4) square(scr_window, center = true);
     }
 }
 module wiring_cover_label() { }   // plain (the wire-colour table was removed: not needed)
@@ -413,8 +414,6 @@ module strip_clip(s, names) {
             // the screw ears, only beyond the strip's ends (the front row's screws stay open)
             for (x = [-10, s[0] + 3.2 + strip_play]) translate([x, tray / 2 - 5, 0]) cube([10, 10 + 5, 2.4]);
             translate([-1, tray / 2, 0]) cube([s[0] + 5.2, tray / 2 + 6, 2.4]);  // over the upper row, and 5 mm on (room for the names)
-            // a lip down over the upper row's wire side, so the pre-wired leads can't be touched
-            translate([-1, tray, -8]) cube([s[0] + 5.2, 1.6, 10.4]);
         }
         for (x = [-6, s[0] + 3.2 + strip_play + 6]) translate([x, tray / 2, -1]) cylinder(d = 3.4, h = 5);
         clip_labels(s, names);   // inlays, 2nd colour: each terminal's name
@@ -511,10 +510,10 @@ else if (part == "power_cover") rotate([180, 0, 0]) power_cover();
 else if (part == "test_inserts") test_inserts();
 else if (part == "test_base") test_base();
 else if (part == "test_fits") test_fits();
-else if (part == "clips") rotate([180, 0, 0]) clips();   // lip up
+else if (part == "clips") clips();   // flat, names up (the names are black inlays in the top layers)
 else if (part == "thumb_knob") thumb_knob();
 else if (part == "test_screen") test_screen();
 else if (part == "lid_labels") rotate([180, 0, 0]) lid_label();   // same turn as their part
 else if (part == "wiring_cover_labels") rotate([180, 0, 0]) wiring_cover_label();
 else if (part == "power_cover_labels") rotate([180, 0, 0]) power_cover_label();
-else if (part == "clips_labels") rotate([180, 0, 0]) clips_labels();
+else if (part == "clips_labels") clips_labels();
