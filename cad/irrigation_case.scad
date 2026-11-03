@@ -286,8 +286,7 @@ function a8_hole_xy(p) = [a8_x0 - wall + p[0], (a8_y0 - up_y0) + (a8_flip ? p[1]
 
 // ── Etching (one colour) ───────────────────────────────────────────────────
 // Everything is etched 0.6 mm into its part, the same colour (decided 2026-11-02): outside only a
-// water drop and a line framing the screen, no words; inside, the terminal names on the clips and
-// the valve wire colours in the wiring cover. (The *_labels parts are the same shapes, should a
+// water drop and a line framing the screen, no words; inside, only the terminal names on the clips. (The *_labels parts are the same shapes, should a
 // second colour ever be wanted.)
 label_d = 0.6;
 bold = "Liberation Sans:style=Bold";
@@ -310,12 +309,7 @@ module lid_label() {
         offset(r = 4.6) square(scr_window, center = true);
     }
 }
-module wiring_cover_label() {   // nothing outside; inside, which valve wire is which
-    // inside: which valve wire is which (read from inside, so mirrored)
-    for (i = [0 : len(wire_colours) - 1])
-        translate([wiring_w - 0.6 - 14 - (i % 3) * 36, 22 - floor(i / 3) * 9, 0]) mirror([1, 0, 0])
-            linear_extrude(label_d + 0.01) text(wire_colours[i], size = 4.5, font = bold);
-}
+module wiring_cover_label() { }   // plain (the wire-colour table was removed: not needed)
 module power_cover_label() { }   // plain (no words on the front)
 module clip_labels(s, names) {   // one name beside each position, on the clip's top (upright text)
     pitch = s[0] / len(names);

@@ -12,8 +12,8 @@ lip up), and the test prints `test_inserts` (pick the heat-set insert hole) and 
 `exploded`, `open` (covers off). STL output goes to `stl/` (not committed).
 
 One colour. The front has no words: a water drop etched into the lid and an etched line framing
-the screen; edges and the window are chamfered. Inside, the terminal names (clips) and the valve
-wire colours (wiring cover) are etched too.
+the screen; edges and the window are chamfered. Inside, the terminal names are etched on the
+strip clips (plate 4).
 
 Estimates still to check on the real parts: the EVEPS height and the CPT's tabs. The screen is
 measured (holes 92 x 45 mm, 3 mm; glass 4.07 mm above the board).
