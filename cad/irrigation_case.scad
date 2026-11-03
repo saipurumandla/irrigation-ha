@@ -28,7 +28,7 @@ cover_t = 2.4;      // bay covers
 // Heat-set inserts (the user's kit, its size chart: knurls 5.0, pilot collar 4.2, M3, L 4 and 6).
 // The hole is about the pilot (4.2), confirmed with the test strip (4.1 / 4.2 / 4.3 / 4.4).
 // 6 mm ones where there's depth, 4 mm ones in the base plate's posts.
-ins_d = 4.2;
+ins_d = 4.2;            // confirmed: the best fit in the test strip (2026-11-02)
 ins_depth = 6.5;        // M3 L6
 ins_depth_short = 4.5;  // M3 L4
 boss_d = 9;

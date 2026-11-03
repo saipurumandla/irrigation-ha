@@ -215,8 +215,7 @@ the lid open; anything can be changed later by opening it.
 Modelled in `cad/irrigation-case/` (OpenSCAD; README there lists parts and screws). Test prints:
 - PLA: the A8's standoffs line up (relays up); the terminal strip fits its tray (now a 0.1 mm press
   fit, 2 mm walls); the PG7 gland fits; keyholes fine.
-- PETG, printing 2026-11-02 (`test_inserts` 4.1-4.4 + `test_fits` with a nut-rail piece): still to
-  check.
+- PETG (2026-11-02): insert hole **4.2 mm** is the best fit (goes in nicely). Nut rail: to check.
 
 **Next:**
 1. When the PETG test is done: which insert hole (4.1 / 4.2 / 4.3 / 4.4) holds an L6 best (iron
