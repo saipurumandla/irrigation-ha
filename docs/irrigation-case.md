@@ -171,7 +171,8 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
   deep (wire in to wire out), 14.0 mm to the top of the screw towers, base 7.9 mm, wire hole 2.5
   mm; a mounting hole in the web between every two positions (M3). WIRING bay: the full 12
   (about 110 mm); POWER bay: 5 positions (about 46 mm).
-- WAGO 221-413: about 18.7 x 18.6 x 8.3 mm (distributors' data); pockets 19.5 x 19.5 mm.
+- WAGO 221-413: about 18.7 x 18.6 x 8.3 mm (distributors' data); they sit loose in the power bay,
+  held by their wires (no holder).
 - Glands (combo set), thread for the holes: PG7 12.5, PG9 15.2, PG11 18.6, PG13.5 20.4 mm.
   The valve wires come out of the wall into the back of the box (no gland for them).
 - M3 heat-set inserts (a set): hole size from the test strip.

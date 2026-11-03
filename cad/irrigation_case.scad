@@ -198,12 +198,7 @@ module bay_pockets() {
     // wiring bay: the 12-strip lies across, its screws to the front, above the wall hole
     sx = wall + (wiring_w - strip12[0]) / 2;
     translate([sx - 1.6, wall + lower_h - strip12[1] - 14, back]) strip_pocket(strip12);
-    // power bay: 4 Wagos (2 x 2) and the 5-strip
-    translate([power_x0 + 4, wall + lower_h - 2 * (wago[1] + 1) - 6, back]) for (i = [0, 1], j = [0, 1])
-        translate([i * (wago[0] + 2.4), j * (wago[1] + 2.4), 0]) difference() {
-            cube([wago[0] + 3.2, wago[1] + 3.2, 4]);
-            translate([1.6, 1.6, 1]) cube([wago[0] + 0.4, wago[1] + 0.4, 4]);
-        }
+    // power bay: the 5-strip (the 4 Wagos sit loose, held by their wires)
     translate([power_x0 + 4, wall + 8, back]) strip_pocket(strip5);
 }
 module strip_pocket(s) {   // a shallow tray; the printed clip (P7) holds the strip down with 2 screws
