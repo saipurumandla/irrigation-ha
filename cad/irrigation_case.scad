@@ -76,7 +76,8 @@ scr_center = [118, 0];  // x of the screen centre (over the A8's right half); y 
 // ── Bays ──────────────────────────────────────────────────────────────────
 strip12 = [109.5, 16.8, 14];   // length, depth (wire in to out), height
 strip5 = [46, 16.8, 14];
-strip_play = 0.1;              // press fit: exact size was "a little tight, slid in" (PLA test)
+strip_play = 0.1;
+clip_clamp = 0.6;              // the strip clip's posts are this much lower than the strip's top              // press fit: exact size was "a little tight, slid in" (PLA test)
 strip_tray_h = 3;              // tray: 1 mm floor + 2 mm wall (higher would cover the strip's wire holes)
 wiring_hooks = [25, wiring_w - 25];   // x of the wiring cover's 2 hooks, from the bay's left side              // the strip was a little tight in the PLA test tray (exact size)
 wago = [18.7, 18.6, 8.3];
@@ -218,7 +219,9 @@ module strip_pocket(s) {   // a shallow tray; the printed clip (P7) holds the st
     difference() {
         union() {
             cube([s[0] + 3.2 + c, s[1] + 3.2 + c, strip_tray_h]);
-            for (x = [-6, s[0] + 3.2 + c + 6]) translate([x, (s[1] + 3.2 + c) / 2, 0]) insert_boss(s[2] + 1);
+            // posts 0.6 mm below the strip's top: tightening the clip's screws clamps the strip
+            // (at the strip's height, the user found the post a touch higher than the strip)
+            for (x = [-6, s[0] + 3.2 + c + 6]) translate([x, (s[1] + 3.2 + c) / 2, 0]) insert_boss(s[2] + 1 - clip_clamp);
         }
         translate([1.6, 1.6, 1]) cube([s[0] + c, s[1] + c, strip_tray_h]);
     }
@@ -380,7 +383,8 @@ module strip_clip(s, names) {
     l = s[0] + 3.2 + strip_play + 12 + 8;          // from boss to boss, plus ears
     difference() {
         union() {
-            translate([-10, tray / 2 - 5, 0]) cube([l, 10, 2.4]);            // the screw bar
+            // the screw ears, only beyond the strip's ends (the front row's screws stay open)
+            for (x = [-10, s[0] + 3.2 + strip_play]) translate([x, tray / 2 - 5, 0]) cube([10, 10 + 5, 2.4]);
             translate([-1, tray / 2, 0]) cube([s[0] + 5.2, tray / 2 + 6, 2.4]);  // over the upper row, and 5 mm on (room for the names)
             // a lip down over the upper row's wire side, so the pre-wired leads can't be touched
             translate([-1, tray, -8]) cube([s[0] + 5.2, 1.6, 10.4]);
