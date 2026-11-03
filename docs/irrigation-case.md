@@ -159,6 +159,9 @@ not in the repo), which fits the board:**
 - Its enclosure (Gehause_1.stl) stands 46.4 mm out from the plate: everything on the board fits
   in about 42 mm above it. Enough for the planned 66 mm box.
 
+Test print (PLA, 2026-11-02): the A8's 4 holes line up with the standoffs, relays up. Its holes
+pass M3 freely, so it's screwed with M3 (the model uses only M3).
+
 Relay terminals (user, 2026-11-02): 24 screws 5.0 mm apart, the row centred along the relay
 edge (between the corner half holes), about 10.5 mm in from that edge; the orange block is flush
 with the edge (doesn't stick out); the board is 1.6 mm thick.
