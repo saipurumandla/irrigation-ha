@@ -219,6 +219,10 @@ Modelled in `cad/irrigation-case/` (OpenSCAD; README there lists parts and screw
 - PETG (2026-11-02): insert hole **4.2 mm** is the best fit (goes in nicely, M3 holds). Nut rail
   works: nuts slide in, don't turn, a converter tightened down doesn't move. Screen fit: printing.
 
+Final plates (PETG, "Hearth case - strong", sliced 2026-11-02): 1 box 11 h 51 min / 319 g; 2 base
+plate 5 h 38 / 123 g; 3 lid 2 h 32 / 67 g; 4 wiring cover + power cover + clips + thumb knob 2 h 23 /
+53 g. About 22.5 h, 562 g (beige), plus the dark label inlays on plates 3 and 4.
+
 **Next:**
 1. When the PETG test is done: which insert hole (4.1 / 4.2 / 4.3 / 4.4) holds an L6 best (iron
    about 240 C), and whether the nut rail works (2 M3 nuts slide in without turning, an M3 x 10 +

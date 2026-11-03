@@ -478,16 +478,16 @@ else if (part == "open") open_view();
 else if (part == "exploded") assembly(45);
 else if (part == "box") box();
 else if (part == "base") base();
-else if (part == "lid") lid();
-else if (part == "wiring_cover") wiring_cover();
-else if (part == "power_cover") power_cover();
+else if (part == "lid") rotate([180, 0, 0]) lid();   // face down to print
+else if (part == "wiring_cover") rotate([180, 0, 0]) wiring_cover();
+else if (part == "power_cover") rotate([180, 0, 0]) power_cover();
 else if (part == "test_inserts") test_inserts();
 else if (part == "test_base") test_base();
 else if (part == "test_fits") test_fits();
-else if (part == "clips") clips();
+else if (part == "clips") rotate([180, 0, 0]) clips();   // lip up
 else if (part == "thumb_knob") thumb_knob();
 else if (part == "test_screen") test_screen();
-else if (part == "lid_labels") lid_label();
-else if (part == "wiring_cover_labels") wiring_cover_label();
-else if (part == "power_cover_labels") power_cover_label();
-else if (part == "clips_labels") clips_labels();
+else if (part == "lid_labels") rotate([180, 0, 0]) lid_label();   // same turn as their part
+else if (part == "wiring_cover_labels") rotate([180, 0, 0]) wiring_cover_label();
+else if (part == "power_cover_labels") rotate([180, 0, 0]) power_cover_label();
+else if (part == "clips_labels") rotate([180, 0, 0]) clips_labels();
