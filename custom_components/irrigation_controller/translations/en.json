@@ -1,0 +1,76 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Irrigation controller",
+        "description": "Pick the ESPHome irrigation controller.",
+        "data": { "device_id": "Controller" }
+      }
+    },
+    "abort": {
+      "no_controllers": "No ESPHome irrigation controller found. Add the controller to the ESPHome integration first.",
+      "already_configured": "Every controller found is already set up."
+    }
+  },
+  "services": {
+    "run_zone": {
+      "name": "Run zone",
+      "description": "Waters one zone for some minutes (or its own minutes by hand), stopping anything else.",
+      "fields": {
+        "zone": { "name": "Zone", "description": "Number (1-8) or name." },
+        "minutes": { "name": "Minutes", "description": "Leave out to use the zone's own minutes by hand." },
+        "device_id": { "name": "Controller", "description": "Only needed with more than one controller." }
+      }
+    },
+    "run_zones": {
+      "name": "Run zones",
+      "description": "Waters several zones one after another.",
+      "fields": {
+        "zones": { "name": "Zones", "description": "Numbers or names, in order." },
+        "minutes": { "name": "Minutes each", "description": "0 or empty: each zone's own minutes by hand." },
+        "device_id": { "name": "Controller", "description": "Only needed with more than one controller." }
+      }
+    },
+    "stop": {
+      "name": "Stop",
+      "description": "Stops all watering.",
+      "fields": { "device_id": { "name": "Controller", "description": "Only needed with more than one controller." } }
+    },
+    "rename_zone": {
+      "name": "Rename zone",
+      "description": "Renames a zone on the controller and its screen, and every entity of that zone here.",
+      "fields": {
+        "zone": { "name": "Zone", "description": "Number (1-8) or current name." },
+        "name": { "name": "Name", "description": "Up to 20 characters. Empty puts the firmware's name back." },
+        "device_id": { "name": "Controller", "description": "Only needed with more than one controller." }
+      }
+    },
+    "set_program": {
+      "name": "Set program",
+      "description": "Changes a program (A-D) in one go. Anything left out stays as it is.",
+      "fields": {
+        "program": { "name": "Program", "description": "A, B, C or D." },
+        "enabled": { "name": "On", "description": "Whether the program runs." },
+        "day_mode": { "name": "Which days", "description": "Days of the week, every N days, odd or even dates." },
+        "days": { "name": "Days", "description": "For days of the week." },
+        "every_n_days": { "name": "Every N days", "description": "For every N days." },
+        "start_times": { "name": "Start times", "description": "Up to 4, like [\"6:00\", \"18:30\"]." },
+        "minutes": { "name": "Minutes per zone", "description": "Zone (number or name) to minutes; 0 skips the zone." },
+        "device_id": { "name": "Controller", "description": "Only needed with more than one controller." }
+      }
+    },
+    "sync_zone_names": {
+      "name": "Apply zone names",
+      "description": "Gives every zone entity its zone's current name (also happens by itself on a rename).",
+      "fields": { "device_id": { "name": "Controller", "description": "Only needed with more than one controller." } }
+    },
+    "get_history": {
+      "name": "Get watering history",
+      "description": "Every run in the last days, and minutes per zone.",
+      "fields": {
+        "days": { "name": "Days", "description": "How many days back, today included." },
+        "device_id": { "name": "Controller", "description": "Only needed with more than one controller." }
+      }
+    }
+  }
+}

@@ -1,0 +1,127 @@
+run_zone:
+  fields:
+    zone:
+      required: true
+      example: "Back Bed"
+      selector:
+        text:
+    minutes:
+      example: 10
+      selector:
+        number:
+          min: 1
+          max: 240
+          unit_of_measurement: min
+    device_id:
+      selector:
+        device:
+          integration: irrigation_controller
+
+run_zones:
+  fields:
+    zones:
+      required: true
+      example: '["Drip Front", 4]'
+      selector:
+        object:
+    minutes:
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 240
+          unit_of_measurement: min
+    device_id:
+      selector:
+        device:
+          integration: irrigation_controller
+
+stop:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: irrigation_controller
+
+rename_zone:
+  fields:
+    zone:
+      required: true
+      example: 3
+      selector:
+        text:
+    name:
+      required: true
+      example: "Back Bed"
+      selector:
+        text:
+    device_id:
+      selector:
+        device:
+          integration: irrigation_controller
+
+set_program:
+  fields:
+    program:
+      required: true
+      selector:
+        select:
+          options: ["A", "B", "C", "D"]
+    enabled:
+      selector:
+        boolean:
+    day_mode:
+      selector:
+        select:
+          options:
+            - label: Days of the week
+              value: days
+            - label: Every N days
+              value: every_n_days
+            - label: Odd dates
+              value: odd
+            - label: Even dates
+              value: even
+    days:
+      example: '["mon", "wed", "fri"]'
+      selector:
+        select:
+          multiple: true
+          options: [mon, tue, wed, thu, fri, sat, sun]
+    every_n_days:
+      selector:
+        number:
+          min: 1
+          max: 30
+    start_times:
+      example: '["6:00", "18:30"]'
+      selector:
+        object:
+    minutes:
+      example: '{"Back Bed": 15, "4": 25}'
+      selector:
+        object:
+    device_id:
+      selector:
+        device:
+          integration: irrigation_controller
+
+sync_zone_names:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: irrigation_controller
+
+get_history:
+  fields:
+    days:
+      default: 7
+      selector:
+        number:
+          min: 1
+          max: 30
+    device_id:
+      selector:
+        device:
+          integration: irrigation_controller

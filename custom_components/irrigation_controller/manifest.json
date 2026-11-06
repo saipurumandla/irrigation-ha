@@ -1,0 +1,12 @@
+{
+  "domain": "irrigation_controller",
+  "name": "Irrigation controller",
+  "after_dependencies": ["esphome", "recorder"],
+  "codeowners": ["@saipurumandla"],
+  "config_flow": true,
+  "documentation": "https://github.com/saipurumandla/irrigation-ha",
+  "integration_type": "device",
+  "iot_class": "calculated",
+  "requirements": [],
+  "version": "0.1.0"
+}
