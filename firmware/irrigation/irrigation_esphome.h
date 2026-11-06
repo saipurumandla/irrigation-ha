@@ -183,6 +183,9 @@ class Controller {
     if (local_now(today, minute)) publish_next(today, minute);
   }
 
+  /** Seconds left in the current run (0 when idle): the screen's countdown. */
+  uint32_t seconds_left() { return runner_.total_left(now_s()); }
+
  private:
   // ── Settings ──
 

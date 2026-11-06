@@ -44,6 +44,7 @@ esphome:
   includes:
     - irrigation/irrigation_core.h
     - irrigation/irrigation_esphome.h
+    - irrigation/a8_link.h
   on_boot:
     priority: -200  # after every zone and program has registered (-100)
     then:
@@ -76,6 +77,11 @@ esphome:
           c.manual_each = id(manual_minutes_each);
           c.changed();
           c.minute();
+          a8link::server().begin(id(screen_uart));  // the screen mirrors every entity
+          a8link::server().on_wifi([](const std::string &ssid, const std::string &pw) {
+            id(join_wifi).execute(ssid, pw);  // sent by the screen's Wi-Fi setup
+          });
+          a8link::server().set_zones({id(zone_1), id(zone_2), id(zone_3), id(zone_4), id(zone_5), id(zone_6), id(zone_7), id(zone_8)});
 
 esp32:
   board: esp32dev
@@ -104,6 +110,23 @@ wifi:
 
 captive_portal:
 
+script:
+  # Wi-Fi set up from the screen (over the cable): join and save; back to the old network if the
+  # new one doesn't connect within 30 s.
+  - id: join_wifi
+    parameters:
+      ssid: std::string
+      password: std::string
+    then:
+      - logger.log:
+          format: "Wi-Fi from the screen: joining '%s'"
+          args: [ssid.c_str()]
+      - wifi.configure:
+          ssid: !lambda return ssid;
+          password: !lambda return password;
+          save: true
+          timeout: 30s
+
 time:
   - platform: sntp
     id: sntp_time
@@ -117,6 +140,19 @@ interval:
   - interval: 1s
     then:
       - lambda: irrigation::ctl().second();
+      - lambda: a8link::server().heartbeat(irrigation::ctl().seconds_left());
+  - interval: 20ms
+    then:
+      - lambda: a8link::server().poll();
+
+# The screen in the lid (irrigation-screen.yaml), wired to the sensor block: S1 (GPIO14) = our TX
+# to its RXD, S2 (GPIO13) = our RX from its TXD, grounds common. See irrigation/a8_link.h.
+uart:
+  - id: screen_uart
+    tx_pin: GPIO14
+    rx_pin: GPIO13
+    baud_rate: 115200
+    rx_buffer_size: 1024
 
 # ── The board ────────────────────────────────────────────────────────────
 

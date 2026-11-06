@@ -119,6 +119,21 @@ number:
     optimistic: true
     restore_value: true
 
+# The zone's display name (renamable on the screen or in HA; the entity names in HA keep the
+# firmware's name). Starts as the firmware's name; kept across restarts.
+text:
+  - platform: template
+    id: zone_${n}_name
+    name: "Zone ${n} name"
+    icon: mdi:rename-outline
+    entity_category: config
+    mode: text
+    min_length: 0
+    max_length: 20
+    optimistic: true
+    restore_value: true
+    initial_value: "${name}"
+
 # A text timestamp: a float sensor would round the time to about two minutes.
 text_sensor:
   - platform: template

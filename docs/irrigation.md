@@ -100,6 +100,23 @@ wires on NC (every zone came on at once while the board was idle).
 Afterwards (2026-10-31) the valves went **back on the Rain Bird** until the case is built; the A8
 is unpowered and its integration **disabled in HA** again.
 
+## In the case, with the screen (2026-11-05)
+
+The A8 is in its case ([irrigation-case.md](irrigation-case.md), "As built") on one plug, and the
+**Irrigation integration is enabled in HA** again. The valves stay on the Rain Bird until the
+switch-over. The screen in the lid runs its own firmware and talks to the A8 over a cable:
+[irrigation-screen.md](irrigation-screen.md). On the A8 side that added:
+
+- `irrigation/a8_link.h`: the screen link on a UART on S1 / S2 (GPIO14 TX, GPIO13 RX): it mirrors
+  every entity to the screen and applies the screen's changes through the same calls HA uses, so
+  the A8 stays the one source of truth.
+- **Zone names** ("Zone N name", renamable on the screen or in HA; HA's entity names keep the
+  firmware's names).
+- **Wi-Fi from the screen:** the screen can hand the A8 a new network (`wifi.configure`: saved,
+  back to the old one if it doesn't connect in 30 s). Both are on "the house Wi-Fi" since 2026-11-05.
+- `seconds_left()` for the screen's countdown (sent with the link's heartbeat).
+- Rain is wired to **IN8**.
+
 ## Still to do
 
 1. The Rain Bird's current schedule (programs, days, start times, minutes per zone, seasonal %),
@@ -108,4 +125,75 @@ is unpowered and its integration **disabled in HA** again.
    ranges, odd/even on top of weekdays, per-program seasonal on/off, per-zone ignore-rain,
    pause/resume, master valve timing, program button on an input, soil-moisture skip).
 3. Printed case and one-plug power: planned in [irrigation-case.md](irrigation-case.md).
-4. Later: flow sensor on the reclaimed main line, weather-based adjust from HA.
+4. Later: flow sensor, weather-based adjust, master valve: plan below.
+5. Switch-over from the Rain Bird: hang the box, move the valve wires to the strip, copy the Rain
+   Bird's schedule into programs A-D (on the screen or in HA).
+
+## Plan: smart watering, flow and master valve (agreed 2026-11-03, not built yet)
+
+Like Hunter Hydrawise, but local and without needing Home Assistant. Everything optional and set
+at setup, nothing fixed to this house: "do you have a master valve / pump / flow sensor / rain
+sensor, and on which relay / input".
+
+**Two ESP32s, two jobs:**
+
+| | A8's ESP32: the controller | Screen's ESP32-S3 (Hosyond): the brain and face |
+|---|---|---|
+| Does | schedules, zones, master valve / pump, rain sensor, flow checks, caps, all off at restart | touch screen, a web page for setup and settings, the forecast (Open-Meteo, no account or key) and the daily %, litres and status |
+| Talks to | valves and sensors; the screen over the UART cable | the A8 over the cable; Wi-Fi to the internet and browsers |
+| If the other fails | keeps watering with the last settings | shows "controller offline" |
+
+Watering and safety never depend on Wi-Fi, the internet, the screen or a forecast. The risky work
+(web requests, parsing, drawing) is on the S3.
+
+Over the cable: screen → A8 "today's % = 70", "skip next run", "run zone 3", "stop", settings;
+A8 → screen: status, active zone and time left, next run, litres, alarms ("zone 3 stopped: flow
+too high").
+
+**Who needs what:**
+- Box alone: waters, weather-adjusts, guards with flow; set up on the screen or its web page.
+- + Home Assistant: both ESP32s appear as devices (dashboards, history, automations).
+- + Hearth: House setup onboarding, notifications, the Irrigation screen, long-term history.
+
+**Hardware options (setup):**
+- Master valve: any relay (Z8 suggested; the case labels it Z8, not M, so it stays a choice).
+  Opens with every zone, isn't watered itself. Already in the firmware ("Master valve or pump").
+- Pump start: the same setting; the relay drives a pump-start relay (contactor), never the pump.
+- Flow sensor: on S3/S4 (GPIO32/33, 5 V sensor through a divider to 3.3 V), pulses per litre
+  (GR-108: about 330), off when not fitted.
+- Rain input (the case's RAIN / RAIN terminals, any isolated input): none, rain switch (NO/NC,
+  already in the firmware) or tipping-bucket rain gauge (inches per tip, usually 0.01; its slow
+  clicks read fine on an input). The gauge also answers "raining now" (tips in the last hour), so
+  it replaces a switch. S3/S4 stay free for the flow sensor.
+- Per zone: type (lawn, shrubs, beds, drip: the water factor), sun or shade, soil (sandy, loam,
+  clay), and how fast it waters (in/hr: a cup test, or from the flow sensor and the zone's area).
+
+**Predictive watering (on the screen's S3):**
+- Data: one Open-Meteo request (free, no account or key; ~700 bytes): the past 2 days' rain, the
+  forecast rain and chance, high / low temperature and ET0 (FAO Penman-Monteith, computed by
+  Open-Meteo). Credit "Weather data by Open-Meteo.com" on the screen. Free use is non-commercial
+  (10,000 requests a day; we use 2); a sold Hearth would need their paid plan or the US National
+  Weather Service API (free for any use, no ET0: estimate it from temperatures, Hargreaves).
+- A soil water balance per zone: spends ET0 x the zone's factor each day, earns rain (about 80%
+  counted) and watering (litres from the flow sensor when fitted). Rain that fell comes from the
+  house's rain gauge when there is one (Florida storms are very local), else Open-Meteo's
+  regional estimate; a gauge that stops tipping while the forecast shows heavy rain is reported and
+  the regional rain is used.
+- Evening (8 pm): fetch, update the balance, then tomorrow's % (replace what was used) or skip
+  (balance still full, or e.g. 0.25 in at 60%+ forecast, or near freezing) → sent to the A8.
+  Morning re-check an hour before the first start: skip if it's raining now (gauge or switch) or
+  the forecast jumped.
+- Internet down: retry hourly; the A8 waters at the last %, back to the seasonal / monthly % after
+  2 days.
+- The screen (and Hearth) show why: "Tomorrow 70%: cool, light rain", "Skipping: 0.4 in fell".
+
+**Flow (on the A8, works without Wi-Fi):**
+- Litres per zone and run; learns each zone's normal flow over its first runs.
+- Much more than normal (broken head, burst pipe): stop the zone, skip it until checked, go on.
+- No flow with a zone on (valve fault, supply off): stop, flag the zone.
+- Flow with every zone off (leak, valve stuck open): close the master valve, if there is one.
+- Notifications (Hearth) per the house rule: fix first, push only what needs a person.
+
+**Build order:** case and install; setup options (master valve, pump, rain, flow) on the screen,
+its web page and House setup; the A8 ↔ screen link; predictive watering on the S3; flow checks
+once the sensor is plumbed in.
