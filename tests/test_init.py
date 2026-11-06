@@ -137,3 +137,15 @@ async def test_apply_button_and_history_sensors(hass: HomeAssistant):
     assert hass.states.get("button.irrigation_apply_zone_names") is not None
     s = hass.states.get("sensor.irrigation_back_bed_watered_last_7_days")
     assert s is not None and s.attributes["zone"] == 3
+
+
+async def test_zone_map(hass: HomeAssistant):
+    dev, _ = await setup_controller(hass)
+    await add_entry(hass, dev)
+    s = hass.states.get("sensor.irrigation_zones")
+    zones = {z["zone"]: z for z in s.attributes["zones"]}
+    assert zones[3]["name"] == "Back Bed" and zones[3]["switch"] == "switch.irrigation_sides"
+    assert zones[3]["watered"] == "sensor.irrigation_back_bed_watered_last_7_days"
+    progs = {p["program"]: p for p in s.attributes["programs"]}
+    assert progs["B"]["minutes"]["3"] == "number.irrigation_program_b_zone_3_minutes"
+    assert s.attributes["controls"]["stop"] == "button.irrigation_stop"

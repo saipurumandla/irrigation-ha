@@ -15,7 +15,7 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.util import dt as dt_util
 
 from . import logic
-from .const import CONF_DEVICE_ID, DOMAIN, OPT_ZONES
+from .const import CONF_DEVICE_ID, DOMAIN, OPT_ZONES, PROGRAMS
 
 _LOGGER = logging.getLogger(__name__)
 SIGNAL_UPDATE = f"{DOMAIN}_update_{{}}"
@@ -62,6 +62,53 @@ class Controller:
             raise HomeAssistantError(f"The controller has no {domain} called {original_name!r}")
         return eid
 
+    def opt(self, domain: str, original_name: str) -> str | None:
+        """The entity id, or None when this firmware doesn't have it."""
+        return self._by_name.get((domain, original_name))
+
+    def entity_map(self) -> dict:
+        """Every entity a dashboard needs, by what it is (for Hearth and cards)."""
+        reg = er.async_get(self.hass)
+
+        def own(key: str) -> str | None:
+            return reg.async_get_entity_id("sensor", DOMAIN, f"{self.device_id}_{key}")
+
+        zones = []
+        for n in sorted(self.zone_of()):
+            base = self.zone_of()[n]
+            zones.append({
+                "zone": n,
+                "name": self.zone_label(n),
+                "switch": self.opt("switch", base),
+                "enabled": self.opt("switch", f"{base} enabled"),
+                "minutes": self.opt("number", f"{base} minutes by hand"),
+                "last_run": self.opt("sensor", f"{base} last run"),
+                "name_text": self.opt("text", f"Zone {n} name"),
+                "watered": own(f"zone_{n}_watered_7_days"),
+            })
+        programs = []
+        for p in PROGRAMS:
+            if not self.opt("switch", f"Program {p}"):
+                continue
+            programs.append({
+                "program": p,
+                "switch": self.opt("switch", f"Program {p}"),
+                "run": self.opt("button", f"Run program {p}"),
+                "day_mode": self.opt("select", f"Program {p} day mode"),
+                "days": self.opt("text", f"Program {p} days"),
+                "every_n_days": self.opt("number", f"Program {p} every N days"),
+                "start_times": self.opt("text", f"Program {p} start times"),
+                "minutes": {str(z["zone"]): self.opt("number", f"Program {p} zone {z['zone']} minutes") for z in zones},
+            })
+        names = {
+            "status": ("sensor", "Status"), "next_run": ("sensor", "Next run"), "time_remaining": ("sensor", "Time remaining"),
+            "active_zone": ("sensor", "Active zone"), "last_event": ("sensor", "Last event"), "problems": ("sensor", "Schedule problems"),
+            "stop": ("button", "Stop"), "next_zone": ("button", "Next zone"), "skip_next_run": ("switch", "Skip next run"),
+            "rain_delay": ("number", "Rain delay"), "seasonal_adjust": ("number", "Seasonal adjust"),
+            "rain_sensor": ("binary_sensor", "Rain sensor"), "rain_sensor_input": ("select", "Rain sensor input"),
+        }
+        return {"zones": zones, "programs": programs, "controls": {k: self.opt(*v) for k, v in names.items()}}
+
     def state(self, domain: str, original_name: str) -> str:
         s = self.hass.states.get(self.entity(domain, original_name))
         return s.state if s else "unavailable"
@@ -88,6 +135,7 @@ class Controller:
         await self.async_sync_names()  # also works out which zone is which, the first time
         texts = [e.entity_id for e in self.entries if e.domain == "text" and logic.ZONE_TEXT.match(e.original_name)]
         switches = [self.zone_switch(n) for n in self.zone_of()]
+        switches += [x for n in self.zone_of() if (x := self.opt("switch", f"{self.zone_of()[n]} enabled"))]
 
         @callback
         def names_changed(event: Event[EventStateChangedData]) -> None:

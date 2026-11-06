@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
-from homeassistant.const import UnitOfTime
+from homeassistant.const import EntityCategory, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
@@ -19,7 +19,7 @@ DAYS = 7
 
 async def async_setup_entry(hass: HomeAssistant, entry: IrrigationConfigEntry, add: AddConfigEntryEntitiesCallback) -> None:
     c = entry.runtime_data
-    add([Watered(c, n) for n in sorted(c.zone_of())], update_before_add=True)
+    add([Watered(c, n) for n in sorted(c.zone_of())] + [ZoneMap(c)], update_before_add=True)
 
 
 class Watered(IrrigationEntity, SensorEntity):
@@ -62,3 +62,21 @@ class Watered(IrrigationEntity, SensorEntity):
                 if e > start
             ],
         }
+
+
+class ZoneMap(IrrigationEntity, SensorEntity):
+    """How many zones are on; its attributes map every zone, program and control to its entity."""
+
+    _attr_name = "Zones"
+    _attr_icon = "mdi:sprinkler-variant"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def __init__(self, controller) -> None:
+        super().__init__(controller, "zones")
+
+    async def async_update(self) -> None:
+        m = self.controller.entity_map()
+        self._attr_native_value = sum(
+            1 for z in m["zones"] if z["enabled"] and (s := self.hass.states.get(z["enabled"])) and s.state == "on"
+        )
+        self._attr_extra_state_attributes = m
