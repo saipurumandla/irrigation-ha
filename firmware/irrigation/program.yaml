@@ -1,0 +1,117 @@
+# One program (A-D): which days, what times, and minutes per zone. Included from irrigation.yaml.
+# vars: p (A-D), i (0-3)
+
+esphome:
+  on_boot:
+    priority: -100
+    then:
+      - lambda: |-
+          auto &p = irrigation::ctl().programs[${i}];
+          p.enabled = id(program_${p}_enabled);
+          p.mode = id(program_${p}_days_mode);
+          p.days = id(program_${p}_days);
+          p.starts = id(program_${p}_starts);
+          p.interval = id(program_${p}_every_days);
+          p.anchor = &id(program_${p}_anchor);
+          p.minutes[0] = id(program_${p}_zone_1);
+          p.minutes[1] = id(program_${p}_zone_2);
+          p.minutes[2] = id(program_${p}_zone_3);
+          p.minutes[3] = id(program_${p}_zone_4);
+          p.minutes[4] = id(program_${p}_zone_5);
+          p.minutes[5] = id(program_${p}_zone_6);
+          p.minutes[6] = id(program_${p}_zone_7);
+          p.minutes[7] = id(program_${p}_zone_8);
+
+globals:
+  # The day "every N days" counts from (set when N is changed).
+  - id: program_${p}_anchor
+    type: int
+    restore_value: true
+    initial_value: "0"
+
+switch:
+  - platform: template
+    id: program_${p}_enabled
+    name: "Program ${p}"
+    icon: mdi:calendar-clock
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - lambda: irrigation::ctl().changed();
+    on_turn_off:
+      - lambda: irrigation::ctl().changed();
+
+select:
+  - platform: template
+    id: program_${p}_days_mode
+    name: "Program ${p} day mode"
+    icon: mdi:calendar-week
+    entity_category: config
+    options: ["Days of the week", "Every N days", "Odd dates", "Even dates"]
+    initial_option: "Days of the week"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+text:
+  # Like "Mon, Wed, Sat", "daily" or "weekdays".
+  - platform: template
+    id: program_${p}_days
+    name: "Program ${p} days"
+    icon: mdi:calendar-check
+    entity_category: config
+    mode: text
+    max_length: 64
+    optimistic: true
+    restore_value: true
+    initial_value: ""
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  # Up to four, like "5:00, 18:30" or "5am, 6:30pm".
+  - platform: template
+    id: program_${p}_starts
+    name: "Program ${p} start times"
+    icon: mdi:clock-start
+    entity_category: config
+    mode: text
+    max_length: 64
+    optimistic: true
+    restore_value: true
+    initial_value: ""
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+number:
+  - platform: template
+    id: program_${p}_every_days
+    name: "Program ${p} every N days"
+    icon: mdi:calendar-refresh
+    entity_category: config
+    mode: box
+    min_value: 1
+    max_value: 30
+    step: 1
+    initial_value: 2
+    optimistic: true
+    restore_value: true
+    set_action:
+      - lambda: irrigation::ctl().reset_anchor(${i});
+
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 1 } }
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 2 } }
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 3 } }
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 4 } }
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 5 } }
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 6 } }
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 7 } }
+  - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 8 } }
+
+button:
+  - platform: template
+    name: "Run program ${p}"
+    icon: mdi:play-circle-outline
+    on_press:
+      - lambda: irrigation::ctl().run_program(${i});

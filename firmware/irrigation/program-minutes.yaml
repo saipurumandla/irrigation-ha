@@ -1,0 +1,16 @@
+# A program's minutes for one zone (0 = not in this program). vars: p (A-D), z (1-8)
+platform: template
+id: program_${p}_zone_${z}
+name: "Program ${p} zone ${z} minutes"
+icon: mdi:timer-sand
+entity_category: config
+unit_of_measurement: min
+mode: box
+min_value: 0
+max_value: 240
+step: 1
+initial_value: 0
+optimistic: true
+restore_value: true
+on_value:
+  - lambda: irrigation::ctl().changed();

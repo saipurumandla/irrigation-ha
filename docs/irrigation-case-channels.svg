@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900">
+<rect x="0" y="0" width="1500" height="900" rx="0" fill="#fff" stroke="none" stroke-width="0" opacity="1"/>
+<text x="750.0" y="40" font-size="24" fill="#222" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Wire channels behind the A8 (seen from the front, base drawn see-through)</text>
+<rect x="70" y="80" width="570.0" height="660.0" rx="12" fill="#f4f6f8" stroke="#333" stroke-width="3" opacity="1"/>
+<rect x="70" y="575.0" width="336.0" height="165.0" rx="6" fill="#eef6ee" stroke="#5a8" stroke-width="2" opacity="1"/>
+<text x="238.0" y="730.0" font-size="15" fill="#285" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">WIRING bay</text>
+<rect x="406.0" y="575.0" width="234.0" height="165.0" rx="6" fill="#fbf1e6" stroke="#c96" stroke-width="2" opacity="1"/>
+<text x="523.0" y="730.0" font-size="15" fill="#a63" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">POWER bay</text>
+<rect x="130.0" y="164.0" width="450.0" height="330.0" rx="6" fill="#2e7d4f" stroke="#1d5434" stroke-width="2" opacity="0.25"/>
+<rect x="130.0" y="164.0" width="450.0" height="330.0" rx="6" fill="none" stroke="#1d5434" stroke-width="2" stroke-dasharray="8 5" opacity="1"/>
+<text x="355.0" y="329.0" font-size="17" fill="#1d5434" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">KC868-A8 (on the front of the base)</text>
+<rect x="148.0" y="173.0" width="414.0" height="30.0" rx="3" fill="#f08a24" stroke="#a85a10" stroke-width="1.5" opacity="0.5"/>
+<text x="355.0" y="194.0" font-size="13" fill="#7a3d00" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">relay 1 … relay 8   (each: NC · COM · NO)</text>
+<path d="M166.0,140.0 L544.0,140.0" stroke="#2b7bd6" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+<path d="M166.0,140.0 L94.0,140.0 L94.0,599.0" stroke="#2b7bd6" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+<circle cx="166.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="166.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z1</text>
+<circle cx="220.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="220.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z2</text>
+<circle cx="274.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="274.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z3</text>
+<circle cx="328.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="328.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z4</text>
+<circle cx="382.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="382.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z5</text>
+<circle cx="436.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="436.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z6</text>
+<circle cx="490.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="490.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z7</text>
+<circle cx="544.0" cy="140.0" r="7" fill="#fff" stroke="#2b7bd6" stroke-width="2.5"/>
+<text x="544.0" y="126.0" font-size="12" fill="#2b7bd6" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Z8</text>
+<circle cx="100.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<circle cx="124.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<circle cx="148.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<circle cx="172.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<circle cx="196.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<circle cx="220.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<circle cx="244.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<circle cx="268.0" cy="584.0" r="5" fill="#fff" stroke="#2b7bd6" stroke-width="2"/>
+<text x="205.0" y="561.0" font-size="1" fill="#222" text-anchor="middle" font-weight="normal" font-family="Helvetica,Arial,sans-serif"></text>
+<path d="M616.0,587.0 L616.0,140.0 L568.0,140.0" stroke="#d35400" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+<circle cx="568.0" cy="140.0" r="7" fill="#fff" stroke="#d35400" stroke-width="2.5"/>
+<text x="574.0" y="166.0" font-size="12" fill="#d35400" text-anchor="start" font-weight="bold" font-family="Helvetica,Arial,sans-serif">24V→COM8</text>
+<path d="M598.0,587.0 L598.0,260.0" stroke="#8e44ad" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+<rect x="580.0" y="236.0" width="36.0" height="18.0" rx="2" fill="#fff" stroke="#8e44ad" stroke-width="2.5" opacity="1"/>
+<text x="574.0" y="224.0" font-size="12" fill="#8e44ad" text-anchor="end" font-weight="bold" font-family="Helvetica,Arial,sans-serif">screen cable exit (plug passes)</text>
+<rect x="148.0" y="464.0" width="414.0" height="24.0" rx="2" fill="#3aa55d" stroke="#1d5434" stroke-width="1.5" opacity="0.5"/>
+<text x="355.0" y="479.0" font-size="12" fill="#0b4" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">inputs · S1 S2 S3 · +12V GND (bottom edge)</text>
+<circle cx="250.0" cy="506.0" r="6" fill="#fff" stroke="#16a085" stroke-width="2.5"/>
+<path d="M250.0,506.0 L250.0,584.0" stroke="#16a085" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+<text x="250.0" y="536.0" font-size="11" fill="#16a085" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">RAIN→IN</text>
+<circle cx="415.0" cy="506.0" r="6" fill="#fff" stroke="#8e44ad" stroke-width="2.5"/>
+<path d="M415.0,506.0 L415.0,584.0" stroke="#8e44ad" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+<text x="415.0" y="536.0" font-size="11" fill="#8e44ad" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">S1/S2 UART</text>
+<circle cx="544.0" cy="506.0" r="6" fill="#fff" stroke="#d35400" stroke-width="2.5"/>
+<path d="M544.0,506.0 L544.0,584.0" stroke="#d35400" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+<text x="544.0" y="536.0" font-size="11" fill="#d35400" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">+12V/GND</text>
+<path d="M415.0,569.0 L598.0,569.0" stroke="#8e44ad" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+<path d="M370.0,593.0 L445.0,593.0" stroke="#7f8c8d" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<text x="409.0" y="617.0" font-size="11" fill="#555" text-anchor="middle" font-weight="bold" font-family="Helvetica,Arial,sans-serif">COM→0V</text>
+<text x="690.0" y="110" font-size="18" fill="#222" text-anchor="start" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Channel runs (grooves in the back of the base)</text>
+<path d="M690.0,144 L730.0,144" stroke="#2b7bd6" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<text x="742.0" y="149" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">Zone trunk: Z1–Z8 holes above relays → top</text>
+<text x="742.0" y="167" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">groove → down the left → WIRING bay (8 wires)</text>
+<path d="M690.0,196 L730.0,196" stroke="#d35400" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<text x="742.0" y="201" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">Power trunk: Wago A 24V → up the right → COM8</text>
+<text x="742.0" y="219" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">(COM1–8 jumpered on the front)</text>
+<path d="M690.0,248 L730.0,248" stroke="#d35400" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<text x="742.0" y="253" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">+12V/GND: POWER bay → A8 power block (short</text>
+<text x="742.0" y="271" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">hole)</text>
+<path d="M690.0,300 L730.0,300" stroke="#8e44ad" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<text x="742.0" y="305" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">Screen cable: 5V, GND from CPT + TX/RX from</text>
+<text x="742.0" y="323" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">S1/S2 → up the right → exit behind the screen</text>
+<path d="M690.0,352 L730.0,352" stroke="#16a085" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<text x="742.0" y="357" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">Rain: WIRING bay → an A8 input + GND (short</text>
+<text x="742.0" y="375" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">hole)</text>
+<path d="M690.0,404 L730.0,404" stroke="#7f8c8d" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<text x="742.0" y="409" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">COM / COM2 → Wago B 0V (along the bottom,</text>
+<text x="742.0" y="427" font-size="14" fill="#222" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">between bays)</text>
+<text x="690.0" y="470" font-size="18" fill="#222" text-anchor="start" font-weight="bold" font-family="Helvetica,Arial,sans-serif">Sizes (to confirm after measuring)</text>
+<text x="690.0" y="500" font-size="14" fill="#333" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">• Base ≈ 10 mm thick; grooves ≈ 7 mm deep</text>
+<text x="690.0" y="524" font-size="14" fill="#333" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">• Zone trunk ≈ 12 mm wide (8 × 18 AWG)</text>
+<text x="690.0" y="548" font-size="14" fill="#333" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">• Power/screen trunk ≈ 10 mm wide (5 wires)</text>
+<text x="690.0" y="572" font-size="14" fill="#333" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">• Holes Ø 4 mm, chamfered so insulation isn't cut</text>
+<text x="690.0" y="596" font-size="14" fill="#333" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">• Screen exit: slot ≈ 12 × 6 mm so the plug passes</text>
+<text x="690.0" y="620" font-size="14" fill="#333" text-anchor="start" font-weight="normal" font-family="Helvetica,Arial,sans-serif">• Hole rows placed from the A8's real screw positions</text>
+</svg>

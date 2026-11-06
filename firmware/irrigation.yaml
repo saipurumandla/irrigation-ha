@@ -1,0 +1,470 @@
+# Irrigation controller: KinCony KC868-A8 (V1.7.1, ESP32, USB-C) on ESPHome, replacing the
+# Rain Bird ESP-TM2 in the garage. Eight relays (one per zone, 24 V AC to the valves), eight
+# isolated inputs (a rain sensor can go on any), and Wi-Fi (no Ethernet run to the garage).
+#
+# The schedule runs on the board (irrigation/irrigation_core.h, tested by
+# irrigation/core.test.ts), so watering goes on without Wi-Fi or Home Assistant; the clock comes
+# from the internet (SNTP), not from HA. Every setting is an entity in HA (most on the device's
+# Configuration list) and is kept on the board, so HA is where it's changed and anything else,
+# Hearth included, reads and writes it there:
+#   Zones 1-8      on/off, minutes by hand, max minutes (a hard cap), cycle and soak, last run
+#   Programs A-D   on/off, day mode (days of the week, every N days, odd or even dates), days,
+#                  up to 4 start times, minutes per zone; a "Run program" button each
+#   By hand        each zone's switch, "Zones to run" + "Minutes each" + "Run selected zones",
+#                  "Run all zones", "Run program X", "Next zone" and "Stop" (by hand ignores the
+#                  schedule, rain delay and rain sensor; the caps still hold)
+#   Adjustments    seasonal % (or 12 monthly %), rain delay (days), skip next run, gap between zones
+#   Watering rules (the guard): off / warn / block, allowed days, no-water hours, max minutes
+#   Hardware       master valve or pump (any relay), rain sensor (any input, normally open or closed)
+# Safety, always: one zone open at a time, every relay off after a restart, and a zone open past
+# its cap (+2 min) closes even if the sequencer were wrong.
+#
+# Wiring (docs/irrigation.md): 24 V AC leg 1 to the C terminal of every zone relay (jumpered),
+# each zone wire to its relay's NO, the valves' common wire to leg 2; 12 V DC to +12V / GND
+# (far-left block); a rain sensor between INn and the input block's GND.
+# Wi-Fi and API keys come from esphome/secrets.yaml (gitignored).
+
+substitutions:
+  name: irrigation
+  friendly_name: Irrigation
+  timezone: America/New_York
+  # This house's zones (the Rain Bird's); 6-8 are spare relays, off until named and turned on.
+  zone_1: Left front
+  zone_2: Drip
+  zone_3: Sides
+  zone_4: Back
+  zone_5: Right front
+  zone_6: Zone 6
+  zone_7: Zone 7
+  zone_8: Zone 8
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  includes:
+    - irrigation/irrigation_core.h
+    - irrigation/irrigation_esphome.h
+    - irrigation/a8_link.h
+  on_boot:
+    priority: -200  # after every zone and program has registered (-100)
+    then:
+      - lambda: |-
+          auto &c = irrigation::ctl();
+          c.clock = id(sntp_time);
+          c.seasonal = id(seasonal_percent);
+          c.monthly = id(monthly_percent);
+          c.gap = id(gap_seconds);
+          c.rain_delay = id(rain_delay_days);
+          c.rain_until = &id(rain_delay_until);
+          c.skip_next = id(skip_next_run);
+          c.master = id(master_valve);
+          c.rain_input = id(rain_sensor_input);
+          c.rain_type = id(rain_sensor_type);
+          c.guard_mode = id(guard_mode);
+          c.guard_days = id(guard_days);
+          c.guard_hours = id(guard_hours);
+          c.guard_max = id(guard_max_minutes);
+          c.inputs[0] = id(input_1); c.inputs[1] = id(input_2); c.inputs[2] = id(input_3); c.inputs[3] = id(input_4);
+          c.inputs[4] = id(input_5); c.inputs[5] = id(input_6); c.inputs[6] = id(input_7); c.inputs[7] = id(input_8);
+          c.rain = id(rain_sensor);
+          c.status = id(status_text);
+          c.event = id(last_event);
+          c.problems = id(schedule_problems);
+          c.active_zone = id(active_zone);
+          c.remaining = id(time_remaining);
+          c.next_run = id(next_run);
+          c.manual_zones = id(manual_zones);
+          c.manual_each = id(manual_minutes_each);
+          c.changed();
+          c.minute();
+          a8link::server().begin(id(screen_uart));  // the screen mirrors every entity
+          a8link::server().on_wifi([](const std::string &ssid, const std::string &pw) {
+            id(join_wifi).execute(ssid, pw);  // sent by the screen's Wi-Fi setup
+          });
+          a8link::server().set_zones({id(zone_1), id(zone_2), id(zone_3), id(zone_4), id(zone_5), id(zone_6), id(zone_7), id(zone_8)});
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+
+api:
+  encryption:
+    key: !secret irrigation_api_key
+  # Never reboot for want of Home Assistant either: a reboot stops a running zone.
+  reboot_timeout: 0s
+
+ota:
+  - platform: esphome
+    password: !secret irrigation_ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Watering doesn't need Wi-Fi, so never reboot for the lack of it (a reboot stops a running zone).
+  reboot_timeout: 0s
+  ap:
+    ssid: "${friendly_name} setup"
+
+captive_portal:
+
+script:
+  # Wi-Fi set up from the screen (over the cable): join and save; back to the old network if the
+  # new one doesn't connect within 30 s.
+  - id: join_wifi
+    parameters:
+      ssid: std::string
+      password: std::string
+    then:
+      - logger.log:
+          format: "Wi-Fi from the screen: joining '%s'"
+          args: [ssid.c_str()]
+      - wifi.configure:
+          ssid: !lambda return ssid;
+          password: !lambda return password;
+          save: true
+          timeout: 30s
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: ${timezone}
+    on_time:
+      - seconds: 0
+        then:
+          - lambda: irrigation::ctl().minute();
+
+interval:
+  - interval: 1s
+    then:
+      - lambda: irrigation::ctl().second();
+      - lambda: a8link::server().heartbeat(irrigation::ctl().seconds_left());
+  - interval: 20ms
+    then:
+      - lambda: a8link::server().poll();
+
+# The screen in the lid (irrigation-screen.yaml), wired to the sensor block: S1 (GPIO14) = our TX
+# to its RXD, S2 (GPIO13) = our RX from its TXD, grounds common. See irrigation/a8_link.h.
+uart:
+  - id: screen_uart
+    tx_pin: GPIO14
+    rx_pin: GPIO13
+    baud_rate: 115200
+    rx_buffer_size: 1024
+
+# ── The board ────────────────────────────────────────────────────────────
+
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  scan: true
+  frequency: 100kHz
+
+pcf8574:
+  - id: relays
+    address: 0x24
+  - id: inputs
+    address: 0x22
+
+packages:
+  zone_1: !include { file: irrigation/zone.yaml, vars: { n: 1, pin: 0, name: "${zone_1}", enabled: RESTORE_DEFAULT_ON } }
+  zone_2: !include { file: irrigation/zone.yaml, vars: { n: 2, pin: 1, name: "${zone_2}", enabled: RESTORE_DEFAULT_ON } }
+  zone_3: !include { file: irrigation/zone.yaml, vars: { n: 3, pin: 2, name: "${zone_3}", enabled: RESTORE_DEFAULT_ON } }
+  zone_4: !include { file: irrigation/zone.yaml, vars: { n: 4, pin: 3, name: "${zone_4}", enabled: RESTORE_DEFAULT_ON } }
+  zone_5: !include { file: irrigation/zone.yaml, vars: { n: 5, pin: 4, name: "${zone_5}", enabled: RESTORE_DEFAULT_ON } }
+  zone_6: !include { file: irrigation/zone.yaml, vars: { n: 6, pin: 5, name: "${zone_6}", enabled: RESTORE_DEFAULT_OFF } }
+  zone_7: !include { file: irrigation/zone.yaml, vars: { n: 7, pin: 6, name: "${zone_7}", enabled: RESTORE_DEFAULT_OFF } }
+  zone_8: !include { file: irrigation/zone.yaml, vars: { n: 8, pin: 7, name: "${zone_8}", enabled: RESTORE_DEFAULT_OFF } }
+  program_a: !include { file: irrigation/program.yaml, vars: { p: A, i: 0 } }
+  program_b: !include { file: irrigation/program.yaml, vars: { p: B, i: 1 } }
+  program_c: !include { file: irrigation/program.yaml, vars: { p: C, i: 2 } }
+  program_d: !include { file: irrigation/program.yaml, vars: { p: D, i: 3 } }
+
+binary_sensor:
+  # The eight inputs (on = closed to the input block's GND). Shown for wiring checks.
+  - { platform: gpio, id: input_1, name: "Input 1", entity_category: diagnostic, pin: { pcf8574: inputs, number: 0, mode: { input: true }, inverted: true } }
+  - { platform: gpio, id: input_2, name: "Input 2", entity_category: diagnostic, pin: { pcf8574: inputs, number: 1, mode: { input: true }, inverted: true } }
+  - { platform: gpio, id: input_3, name: "Input 3", entity_category: diagnostic, pin: { pcf8574: inputs, number: 2, mode: { input: true }, inverted: true } }
+  - { platform: gpio, id: input_4, name: "Input 4", entity_category: diagnostic, pin: { pcf8574: inputs, number: 3, mode: { input: true }, inverted: true } }
+  - { platform: gpio, id: input_5, name: "Input 5", entity_category: diagnostic, pin: { pcf8574: inputs, number: 4, mode: { input: true }, inverted: true } }
+  - { platform: gpio, id: input_6, name: "Input 6", entity_category: diagnostic, pin: { pcf8574: inputs, number: 5, mode: { input: true }, inverted: true } }
+  - { platform: gpio, id: input_7, name: "Input 7", entity_category: diagnostic, pin: { pcf8574: inputs, number: 6, mode: { input: true }, inverted: true } }
+  - { platform: gpio, id: input_8, name: "Input 8", entity_category: diagnostic, pin: { pcf8574: inputs, number: 7, mode: { input: true }, inverted: true } }
+
+  # Wet, from whichever input "Rain sensor input" names (off when none is set).
+  - platform: template
+    id: rain_sensor
+    name: "Rain sensor"
+    device_class: moisture
+
+# ── Adjustments, hardware and the watering rules ─────────────────────────
+
+number:
+  - platform: template
+    id: seasonal_percent
+    name: "Seasonal adjust"
+    icon: mdi:sun-thermometer-outline
+    entity_category: config
+    unit_of_measurement: "%"
+    mode: box
+    min_value: 0
+    max_value: 300
+    step: 5
+    initial_value: 100
+    optimistic: true
+    restore_value: true
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  - platform: template
+    id: gap_seconds
+    name: "Gap between zones"
+    icon: mdi:timer-pause-outline
+    entity_category: config
+    unit_of_measurement: s
+    mode: box
+    min_value: 0
+    max_value: 60
+    step: 1
+    initial_value: 2
+    optimistic: true
+    restore_value: true
+
+  # Days without scheduled watering; counts down, 0 clears it. Shown as days left.
+  - platform: template
+    id: rain_delay_days
+    name: "Rain delay"
+    icon: mdi:weather-pouring
+    unit_of_measurement: d
+    mode: box
+    min_value: 0
+    max_value: 14
+    step: 1
+    set_action:
+      - lambda: irrigation::ctl().set_rain_delay(x);
+
+  # By hand: minutes for each zone in "Zones to run"; 0 uses each zone's own minutes by hand.
+  - platform: template
+    id: manual_minutes_each
+    name: "Minutes each"
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: min
+    mode: box
+    min_value: 0
+    max_value: 120
+    step: 1
+    initial_value: 0
+    optimistic: true
+    restore_value: true
+
+  - platform: template
+    id: guard_max_minutes
+    name: "Watering rules max minutes per zone"
+    icon: mdi:timer-lock-outline
+    entity_category: config
+    unit_of_measurement: min
+    mode: box
+    min_value: 0
+    max_value: 240
+    step: 1
+    initial_value: 0
+    optimistic: true
+    restore_value: true
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+text:
+  # By hand: which zones "Run selected zones" waters, in this order, like "1, 3, 5" or "all".
+  - platform: template
+    id: manual_zones
+    name: "Zones to run"
+    icon: mdi:format-list-numbered
+    mode: text
+    max_length: 32
+    optimistic: true
+    restore_value: true
+    initial_value: "all"
+
+  # Twelve percentages, January to December, like "60,60,80,100,120,120,120,120,100,80,60,60".
+  # Empty: the single seasonal adjust is used all year.
+  - platform: template
+    id: monthly_percent
+    name: "Monthly adjust"
+    icon: mdi:calendar-month
+    entity_category: config
+    mode: text
+    max_length: 64
+    optimistic: true
+    restore_value: true
+    initial_value: ""
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  # Days watering is allowed, like "Wed, Sat"; empty is every day.
+  - platform: template
+    id: guard_days
+    name: "Watering rules allowed days"
+    icon: mdi:calendar-lock
+    entity_category: config
+    mode: text
+    max_length: 64
+    optimistic: true
+    restore_value: true
+    initial_value: ""
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  # Like "10:00-16:00"; empty is none.
+  - platform: template
+    id: guard_hours
+    name: "Watering rules no-water hours"
+    icon: mdi:clock-remove-outline
+    entity_category: config
+    mode: text
+    max_length: 32
+    optimistic: true
+    restore_value: true
+    initial_value: ""
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+select:
+  - platform: template
+    id: guard_mode
+    name: "Watering rules"
+    icon: mdi:shield-check-outline
+    entity_category: config
+    options: ["Off", "Warn", "Block"]
+    initial_option: "Off"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  # Where the water comes from, for whoever sets the rules (Hearth's presets); the board doesn't use it.
+  - platform: template
+    id: water_source
+    name: "Water source"
+    icon: mdi:water-pump
+    entity_category: config
+    options: ["Potable", "Well", "Reclaimed"]
+    initial_option: "Reclaimed"
+    optimistic: true
+    restore_value: true
+
+  # A relay that opens with every zone (a master valve or pump start); that zone isn't watered itself.
+  - platform: template
+    id: master_valve
+    name: "Master valve or pump"
+    icon: mdi:valve
+    entity_category: config
+    options: ["None", "Relay 1", "Relay 2", "Relay 3", "Relay 4", "Relay 5", "Relay 6", "Relay 7", "Relay 8"]
+    initial_option: "None"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  - platform: template
+    id: rain_sensor_input
+    name: "Rain sensor input"
+    icon: mdi:weather-rainy
+    entity_category: config
+    options: ["None", "Input 1", "Input 2", "Input 3", "Input 4", "Input 5", "Input 6", "Input 7", "Input 8"]
+    initial_option: "None"
+    optimistic: true
+    restore_value: true
+
+  - platform: template
+    id: rain_sensor_type
+    name: "Rain sensor type"
+    icon: mdi:electric-switch
+    entity_category: config
+    options: ["Normally closed (opens when wet)", "Normally open (closes when wet)"]
+    initial_option: "Normally closed (opens when wet)"
+    optimistic: true
+    restore_value: true
+
+switch:
+  - platform: template
+    id: skip_next_run
+    name: "Skip next run"
+    icon: mdi:debug-step-over
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+button:
+  - platform: template
+    name: "Run all zones"
+    icon: mdi:play-box-multiple-outline
+    on_press:
+      - lambda: irrigation::ctl().run_all();
+  - platform: template
+    name: "Run selected zones"
+    icon: mdi:playlist-play
+    on_press:
+      - lambda: irrigation::ctl().run_selected();
+  - platform: template
+    name: "Next zone"
+    icon: mdi:skip-next-circle-outline
+    on_press:
+      - lambda: irrigation::ctl().next_zone();
+  - platform: template
+    name: "Stop"
+    icon: mdi:stop-circle-outline
+    on_press:
+      - lambda: irrigation::ctl().stop_all();
+  - platform: restart
+    name: "Restart"
+    entity_category: config
+
+globals:
+  - id: rain_delay_until
+    type: int
+    restore_value: true
+    initial_value: "0"
+
+# ── What it's doing ──────────────────────────────────────────────────────
+
+text_sensor:
+  - platform: template
+    id: status_text
+    name: "Status"
+    icon: mdi:sprinkler
+  - platform: template
+    id: last_event
+    name: "Last event"
+    icon: mdi:message-text-clock-outline
+  # A text timestamp: a float sensor would round the time to about two minutes.
+  - platform: template
+    id: next_run
+    name: "Next run"
+    icon: mdi:calendar-start
+    device_class: timestamp
+  - platform: template
+    id: schedule_problems
+    name: "Schedule problems"
+    icon: mdi:alert-circle-outline
+    entity_category: diagnostic
+
+sensor:
+  - platform: template
+    id: active_zone
+    name: "Active zone"
+    icon: mdi:numeric
+    accuracy_decimals: 0
+  - platform: template
+    id: time_remaining
+    name: "Time remaining"
+    icon: mdi:timer-sand
+    unit_of_measurement: min
+    accuracy_decimals: 0
+  - platform: wifi_signal
+    name: "Wi-Fi signal"
+    entity_category: diagnostic
+    update_interval: 60s
+  - platform: uptime
+    name: "Uptime"
+    entity_category: diagnostic
