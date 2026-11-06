@@ -7,16 +7,15 @@ plug**. Agreed 2026-10-31; sizes are estimates until the parts are measured. See
 
 ![Case layout](irrigation-case-layout.svg)
 
-## Layout (about 190 × 220 × 66 mm)
+## Layout (208 × 225 × 66 mm)
 
-Confirmed 2026-11-02: A8 + screen across the top; under it the incoming-wires bay (left, easy
-cover) and the power bay (right, screwed cover). One print on the 260 mm bed.
+Confirmed 2026-11-02: A8 + screen across the top. **Changed 2026-11-03: one wiring bay** under it,
+full width, one cover (it was a wiring bay and a screwed power bay). One print on the 260 mm bed.
 
 | Part of the box | Holds | Opened |
 |---|---|---|
 | **Upper, sealed** | KC868-A8 on its base plate; the Hosyond screen on the lid, over the A8's **right half** (the A8's ESP32 antenna at the left end stays under plain plastic) | rarely: lid hooks over a lip at the top, held by 2 screws reached from the wiring bay |
-| **Lower left, WIRING** | Terminals Z1-Z8, COM, COM 2, RAIN, RAIN | often: cover **slides down** in side grooves; a small bump holds it shut |
-| **Lower right, POWER** | EVEPS (24 V AC → 12 V), CPT (12 → 5 V), 4 Wagos, terminals 24V, 0V, FLOW+, SIG, GND | rarely: cover **held by 2 screws** underneath |
+| **Lower, WIRING (one bay)** | Both terminal strips in a row under the shelf: Z1-Z8, COM, COM 2, RAIN, RAIN, then 24V, 0V, FLOW+, SIG, GND (17). Valve wires in through the back wall; the transformer's cable through a PG7 gland under 24V / 0V; rain and flow cables through knockouts under their terminals. No Wagos. | often: one cover, hooks at the top, a thumb screw at the bottom |
 
 - No screws on the front. Labels ("IRRIGATION", terminal names) printed in dark grey with the
   Kobra X's multi-colour.
@@ -38,13 +37,16 @@ cover) and the power bay (right, screwed cover). One print on the 260 mm bed.
 
 ```
 outlet → Centropower PSU-40 (24 V AC 40 VA, auto-reset PTC; plugs in, 120 V stays in it)
-          24V / 0V screws → 18/2 thermostat wire → POWER bay, right gland
-            Wago A (24V): transformer 24V + relay COM1 (jumpered COM1-COM5) + EVEPS red
-            Wago B (0V):  transformer 0V + COM / COM 2 terminals + EVEPS red
-            Wago C (+12V): EVEPS yellow + A8 +12V + CPT red
-            Wago D (GND):  EVEPS black + A8 GND + CPT black
-            CPT yellow/black → screen 5 V / GND (and FLOW+ / GND for a flow sensor later)
+          24V / 0V screws → 18/2 thermostat wire → gland under the 24V / 0V terminals
+  24V terminal: transformer on the outer screw; inner screw: relay COM1 (COM1-COM5 jumpered)
+                + EVEPS AC in (up the right channel)
+  0V terminal:  transformer on the outer screw; inner screw: COM (linked to COM 2) + EVEPS AC in
+  EVEPS out (yellow +, black −) → A8 +12V / GND; from the same A8 terminals on to the CPT in
+  CPT out (5 V) → screen 5 V / GND (and FLOW+ / GND for a flow sensor later)
 ```
+As built (2026-11-05) the splits are **Wagos** instead (the GYVRM's leads were too short for the
+strip): Wago 1 (+12 V: GYVRM yellow, A8 +12V, CPT in +), Wago 2 (GND: GYVRM black, A8 GND, CPT in
+−), Wagos 3 / 4 (GYVRM AC in, fed from the strip's 24V / 0V inner screws). See "As built" below.
 
 - **EVEPS:** yellow is **+**, black is **−**. Check both converters with the meter on DC before
   connecting (12 V and 5 V) and the transformer's no-load voltage on AC (EVEPS takes up to 28 V).
@@ -55,7 +57,7 @@ outlet → Centropower PSU-40 (24 V AC 40 VA, auto-reset PTC; plugs in, 120 V st
 
 Decided 2026-11-02: only a **rain sensor** and a **flow sensor** (for water used per zone; maybe a
 ZJ-B10S, later) come in from outside, so 12 + 5 positions as below. 12 V, 5 V and 3.3 V stay inside
-on the Wagos. The transformer is a Class 2 plug-in doorbell transformer (24 V AC 40 VA,
+at the A8 and the converters. The transformer is a Class 2 plug-in doorbell transformer (24 V AC 40 VA,
 auto-reset): two wires, no ground needed. No speaker in the lid.
 
 | WIRING (left) | | POWER (right) | |
@@ -78,12 +80,12 @@ POWER side), screwed down through their own mounting holes. On each strip a smal
 
 | Run | From → to | Route |
 |---|---|---|
-| Zone trunk (8 wires) | relay NO1-NO8 (relay 1 at the left end) → WIRING Z1-Z8 | hole above each relay → groove along the top → down the left edge → holes into the WIRING bay |
-| 24 V feed (1) | Wago A → relay COM8 (right end, nearest the POWER bay) | up the right edge; COM1-COM8 jumpered on the front |
-| 12 V (2) | Wago C / D → A8 +12V / GND | short hole straight down from the A8's power block |
-| Screen cable (4) | CPT 5 V + GND, A8 sensor terminals GPIO14/GPIO13 (TX/RX) → screen | along the bottom, up the right edge, out through a slot (about 12 × 6 mm, the plug passes) behind the screen |
-| Rain (2) | WIRING RAIN → an A8 input + GND | short holes at the bottom edge |
-| Common (1) | COM / COM 2 → Wago B (0V) | along the bottom between the bays |
+| Zone trunk (8 wires) | relay NO1-NO8 (relay 1 at the left end) → WIRING Z1-Z8 | through the long slot above the relay row → the base plate's back channel along the top → down the left edge → the left pass-through into the bay → the strip's upper row (under the wire guard) |
+| 24 V feed (1) + EVEPS AC in (2) | 24V terminal (inner screw) → relay COM8; 24V / 0V terminals → EVEPS | up the right channel (it comes down right over 24V / 0V); COM1-COM8 jumpered on the front |
+| 12 V (2) | EVEPS out → A8 +12V / GND, then on to the CPT from the same terminals | in front of the base plate (the gap beside the A8 is only ~2.5 mm) |
+| Screen cable (4) | CPT 5 V + GND, A8 sensor terminals GPIO14/GPIO13 (TX/RX) → screen | in front of the base plate (the CPT sits beside the A8), up to the screen's socket with a slack loop; no hole (review 2026-11-03) |
+| Rain (2) | WIRING RAIN → A8 **IN8** + the input block's GND (as built) | the left pass-through and the back channel, out through the long slot along the green blocks |
+| Common (1) | 0V terminal (inner screw) → COM, COM linked to COM 2 | short jumpers along the strips, in the bay |
 
 - Base about 10 mm thick, grooves about 7 mm deep; zone trunk about 12 mm wide, the right trunk
   about 10 mm. Holes 4 mm, chamfered so insulation isn't cut. Hole rows are placed from the A8's
@@ -133,7 +135,7 @@ pockets are a fallback. Wall: #8 screws and anchors through keyholes in the back
 
 All ordered or in hand (2026-10-31): Centropower PSU-40, EVEPS EV36-A121203, CPT C1205003,
 GUBCUB terminal strips, M3 screw kit, M3 heat-set inserts, Hosyond ESP32-S3 3.5" screen, PG
-gland pack, wall screws and anchors, PETG, soldering iron, Wagos, 18/2 thermostat wire,
+gland pack, wall screws and anchors, PETG, soldering iron, ferrules (twin for two wires under one screw), 18/2 thermostat wire,
 heat-shrink.
 
 ## Measured (KC868-A8, 2026-11-02, calipers; orange relay block at the top)
@@ -185,9 +187,10 @@ with the edge (doesn't stick out); the board is 1.6 mm thick.
   10-28 V AC (check the transformer's no-load voltage first: the Rain Bird's read 28.8-29.3 V).
 - CPT C1205003 (seller's drawing): body 46 x 27 x 14 mm, slotted tabs at both short ends (about
   58 mm over them, to confirm), all four wires leave one long side, leads about 13.5 cm.
-- Hosyond screen, measured on arrival (2026-11-02): board 101.5 x 54.5 mm, 10 mm deep with the parts
-  behind; holes 89.7 x 51.2 mm centre to centre (from two published cases for this board; the hand-measured
-  92 x 45 was edge to edge and didn't line up), 3 mm (M2.5 self-tapping into the lid's posts); 5.67 mm
+- Hosyond screen, measured (2026-11-02/03): board 101.54 x 54.26 mm, 10 mm deep with the parts
+  behind; holes **94.46 x 47.96 mm** centre to centre (calipers 2026-11-03: outer edges 97.45 / 51.0,
+  inner 91.47 / 44.91, holes 3.0 mm; the published cases' 89.7 x 51.2 are for another board and the
+  v2 test was 4.8 mm off; **screen test v3 fits**, 2026-11-03: posts line up, picture centred, glass against the lid), 3 mm (M3 self-tapping into the lid's posts); 5.67 mm
   board + glass (glass 4.07 above the board; the test print left a gap over 0.8 mm with 4.4 mm
   posts, so posts 3.5: the glass rests against the lid); picture 73.4 x 49.0 centred (window 76 x
   51). One socket, UART (5V GND TXD RXD), on the bottom edge carries the A8 link and its power;
@@ -221,21 +224,89 @@ Modelled in `cad/irrigation-case/` (OpenSCAD; README there lists parts and screw
 - PETG (2026-11-02): insert hole **4.2 mm** is the best fit (goes in nicely, M3 holds). Nut rail
   works: nuts slide in, don't turn, a converter tightened down doesn't move. Screen fit: printing.
 
-Final plates (PETG, "Hearth case - strong", sliced 2026-11-02): 1 box 11 h 51 min / 319 g; 2 base
-plate 5 h 38 / 123 g; 3 lid 2 h 32 / 67 g; 4 wiring cover + power cover + clips + thumb knob 2 h 23 /
-53 g. About 22.5 h, 562 g (beige), plus the dark label inlays on plates 3 and 4.
+Final plates (PETG, "Hearth case - strong", one-bay version, sliced 2026-11-03): 1 box 11 h 23 /
+305 g; 2 base plate 5 h 38 / 123 g; 3 lid 2 h 31 / 66 g; 4 wiring cover + thumb knob 1 h 31 / 40 g;
+5 wire guard (replaces the 2 clips, 2026-11-03: one piece over both strips' upper rows and the band up to the shelf, hiding the jumpers; the 17 names recessed above the front-row screws; the strips' 4 bosses, M3) on the base plate's plate. About 21.5 h, 541 g. No supports. Big flat parts (box, base,
+lid, cover): bed 85 C, 10 mm brim, fan off for 5 layers then max 30%.
 
-**Next:**
-1. When the PETG test is done: which insert hole (4.1 / 4.2 / 4.3 / 4.4) holds an L6 best (iron
-   about 240 C), and whether the nut rail works (2 M3 nuts slide in without turning, an M3 x 10 +
-   washer through a converter's ear holds it).
-2. Then: set `ins_d` to the winner, export the final parts (box, base, lid, wiring and power covers,
-   clips, thumb knob, and the label inlays), slice them in PETG with `scripts/orca-slice.py`
-   (time and grams), and copy them to a USB stick (the printer has LAN mode, but OrcaSlicer can't
-   send to Anycubic; sending from here would be our own project).
+Marks: the water drop and the 1.2 mm window line are pressed 0.6 mm into the lid's face (the lid
+prints face down: raised marks there, or printing it face up, would need supports under the whole
+face plate). The terminal names on the clips are black inlays (`clips.stl+clips_labels.stl`).
+OrcaSlicer 2.4.2's command line crashes (139) when a part exported turned over (lid, covers) goes
+through its assemble list, so those stay one colour, and the clips are a plate of their own.
+
+Fixes after the first full box (2026-11-03): the strip clips' screw bosses (9 mm, 6 mm past the
+tray ends) landed half inside the bay walls (the 12-strip leaves only ~6 mm at each end; the
+5-strip sat 4 mm from the divider). Now 7 mm bosses, centres 3.5 mm from the wall (fused to it,
+insert hole 1.4 mm clear), clip screws 2.5 mm past the tray ends, the 5-strip moved to the same
+6 mm from the divider; asserts in the CAD fail if a clip insert hole comes within 1 mm of a wall.
+The strip trays were very tight in PETG: 0.3 mm clearance now (the clip clamps the strip). The
+first box also warped (the front edge lifted ~5 mm; keyholes and A8 area flat): reprint with
+bed 85 C, 10 mm brim, fan off for 5 layers then max 30%, washed bed + glue stick. Test piece:
+`test_strip_end` (bay wall, tray end, boss, clip end; ~27 min).
+
+Also 2026-11-03: the base plate's back has a 5 mm pocket (slot-shaped, along the keyhole) over
+each high keyhole for the wall screw's head, instead of a 14 mm hole through: the through hole at
+(20, 200) cut the A8's top-left standoff away. The box hangs first, then the plate goes in; the
+box comes off the wall by lifting it (heads slide down the slots), plate and all.
+
+Strip-end test (2026-11-03): tray 0.3 mm clearance was a little wiggly, now 0.15 (0 was very
+tight). Measured over the test piece's back: terminal top 16.27, pillar top 17.47, so the strips
+are 12.27 mm tall (not the seller's 14) and the pillars stood 1.2 mm above them: the guard wouldn't
+clamp. strip height now 12.27, pillars 0.6 below the strips' top again (15.67). The 5-strip is 5 positions cut from a 12-strip: 43.79 mm long (was 46).
+
+Independent review + collision checks (2026-11-03), fixed before the final prints: the lid's
+ledge had a bottom side under the lid's flange and screw posts (lid couldn't seat) - now top and
+sides only; the lid's top hooks were in the lid's plane and hit the top wall - now behind the plate,
+through notches in the top ledge into the wall slots; the flange stops 3.3 mm short of the side
+ledges; the base plate's screen-cable hole (under the A8, no channel) removed - the screen cable
+runs in front; the converter hole no longer cuts the EVEPS rail's nut channel; the base plate
+bosses' insert holes 1 mm deeper (an M3 x 8 bottomed out); lid screws moved to 42 mm from each
+side (their heads were 0.25 mm under the cover's hooks); 45-degree slopes under the cover's rest
+strips; the frame line clear of the mic hole; screen screw holes 1.3 mm into the lid (M3 x 6 fits).
+Collision checks (OpenSCAD intersections): lid/box only touching, cover/box, guard/box, base/box,
+cover/lid clear. Lid screws need a stubby driver or an L hex key. A8 screws: M3 x 6.
+Final plates: 1 base + wire guard + knob 6 h 16 / 133 g; 2 lid + cover 3 h 54 / 104 g; 3 box
+11 h 12 / 302 g (overnight). About 21.5 h, 539 g.
+
+Second review (2026-11-03), fixed: the base plate (202.6 x 137.2) was bigger than the opening
+inside the lid's ledge (197.2 x 134.8): now 196.6 x 134.2, it drops straight in (checked by
+sweeping it along z against the box; everything on it keeps its place); converter screws M3 x 6
+(x 10 jammed into the plate under the nut); lid hooks 0.3 mm behind the plate and their slots
+0.5 mm taller (room to tilt in and out); base screw heads sink 3.1 mm (flush socket heads); the
+frame line 0.9 mm clear of the mic hole. Assembly order and the screw table: cad/irrigation-case/README.md.
+Full check: `python3 cad/irrigation-case/check.py` (asserts, 22 part pairs in place, 8 insertion
+paths: the converters and the A8 slide under the ledge after the plate is in; run before slicing).
+
+**Next:** print the final plates (lid + cover, then base + wire guard + knob, then the box overnight) and assemble in the order in cad/irrigation-case/README.md.
+a USB stick.
 
 ## Steps
 
 1. Measure (above). 2. Model in OpenSCAD (parametric) and send a preview. 3. Print the insert test
 strip and a thin back-plate test fit. 4. Print P1-P5. 5. Assemble and wire, switch from the Rain
 Bird to the Centropower, run each zone for a minute.
+
+
+## As built (2026-11-05)
+
+Assembled, wired and tested on the bench; **not hung yet, and the valves are still on the Rain
+Bird** until the switch-over.
+
+- **Converters swapped:** the CPT (12 → 5 V) on the top rail, the GYVRM / EVEPS (24 V AC → 12 V) on
+  the bottom one. The real converters are smaller than the CAD stand-ins (EVEPS/GYVRM about
+  40 x 70 x 22, CPT about 27 x 58 x 14), so the plate goes in with them already on. The GYVRM's
+  wire side is ~4 mm from the right wall: its leads bend down along the body.
+- **Wagos** (4) beside the converters, as listed under Power. Measured: transformer 27 V AC,
+  GYVRM 12.13 V DC, CPT 5 V DC.
+- **Feed:** strip 24V inner → relay 8 C (all C jumpered); **common:** strip 0V inner → COM → COM 2.
+  Zone wires on relay **NO**.
+- **Rain:** the two RAIN screws go to **IN8** and that block's GND (on the mounted board the input
+  numbering runs the other way from KinCony's picture). In the A8's settings, rain sensor input =
+  Input 8 when a sensor is fitted.
+- **Flow:** SIG → A8 **S3**, flow GND → the sensor block's GND; **FLOW+ empty** until the sensor is
+  chosen (a Rain Bird FG100 is two-wire; whether it needs power is tested when it arrives).
+- **Screen cable:** screen 5V / GND → CPT out, screen RXD → A8 **S1** (GPIO14), TXD → **S2**
+  (GPIO13); the grounds are common (checked). Firmware and link: [irrigation-screen.md](irrigation-screen.md).
+- **Tests passed:** relays 1-8 one at a time (twice, 27.67 V AC at the active zone), restart (no
+  clicks, all off, Idle after ~20 s waiting for the clock), rain input (shorting RAIN turns IN8 on).
