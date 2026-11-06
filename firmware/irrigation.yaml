@@ -22,7 +22,7 @@
 # Wiring (docs/irrigation.md): 24 V AC leg 1 to the C terminal of every zone relay (jumpered),
 # each zone wire to its relay's NO, the valves' common wire to leg 2; 12 V DC to +12V / GND
 # (far-left block); a rain sensor between INn and the input block's GND.
-# Wi-Fi and API keys come from esphome/secrets.yaml (gitignored).
+# Wi-Fi and API keys come from firmware/secrets.yaml (not in git).
 
 substitutions:
   name: irrigation

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Full fit check for the irrigation case: run before slicing anything.
 
-    python3 cad/irrigation-case/check.py
+    python3 cad/check.py
 
 1. The CAD's own asserts (a render of the box, base and lid stops on any failed assert).
 2. Every pair of parts in their final places: an overlap fails; parts resting on each other

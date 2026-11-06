@@ -1,8 +1,8 @@
 # Irrigation controller (KinCony KC868-A8)
 
-Replaces the Rain Bird ESP-TM2 + LNK2 in the garage. Firmware: `esphome/irrigation.yaml`
-(schedule logic in `esphome/irrigation/irrigation_core.h`, tested by
-`esphome/irrigation/core.test.ts`, which `npx vitest run` builds with g++ and runs).
+Replaces the Rain Bird ESP-TM2 + LNK2 in the garage. Firmware: `firmware/irrigation.yaml`
+(schedule logic in `firmware/irrigation/irrigation_core.h`, tested by
+`firmware/irrigation/core.test.ts`, which `npx vitest run` builds with g++ and runs).
 
 The board runs the schedule itself: watering continues without Wi-Fi or Home Assistant, the
 clock comes from the internet (SNTP), and every setting is kept on the board. Home Assistant is

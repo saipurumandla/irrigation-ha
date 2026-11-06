@@ -218,7 +218,7 @@ the lid open; anything can be changed later by opening it.
 
 ## Where it stands (2026-11-02)
 
-Modelled in `cad/irrigation-case/` (OpenSCAD; README there lists parts and screws). Test prints:
+Modelled in `cad/` (OpenSCAD; README there lists parts and screws). Test prints:
 - PLA: the A8's standoffs line up (relays up); the terminal strip fits its tray (now a 0.1 mm press
   fit, 2 mm walls); the PG7 gland fits; keyholes fine.
 - PETG (2026-11-02): insert hole **4.2 mm** is the best fit (goes in nicely, M3 holds). Nut rail
@@ -274,11 +274,11 @@ inside the lid's ledge (197.2 x 134.8): now 196.6 x 134.2, it drops straight in 
 sweeping it along z against the box; everything on it keeps its place); converter screws M3 x 6
 (x 10 jammed into the plate under the nut); lid hooks 0.3 mm behind the plate and their slots
 0.5 mm taller (room to tilt in and out); base screw heads sink 3.1 mm (flush socket heads); the
-frame line 0.9 mm clear of the mic hole. Assembly order and the screw table: cad/irrigation-case/README.md.
-Full check: `python3 cad/irrigation-case/check.py` (asserts, 22 part pairs in place, 8 insertion
+frame line 0.9 mm clear of the mic hole. Assembly order and the screw table: cad/README.md.
+Full check: `python3 cad/check.py` (asserts, 22 part pairs in place, 8 insertion
 paths: the converters and the A8 slide under the ledge after the plate is in; run before slicing).
 
-**Next:** print the final plates (lid + cover, then base + wire guard + knob, then the box overnight) and assemble in the order in cad/irrigation-case/README.md.
+**Next:** print the final plates (lid + cover, then base + wire guard + knob, then the box overnight) and assemble in the order in cad/README.md.
 a USB stick.
 
 ## Steps

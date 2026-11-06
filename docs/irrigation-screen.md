@@ -1,8 +1,8 @@
 # Irrigation screen
 
 The touch screen in the irrigation case's lid: an LCDWIKI **ES3C35P** (sold by Hosyond; the listing
-says "240x320", the board is 320x480). Firmware: `esphome/irrigation-screen.yaml`, with
-`esphome/screen/` (the A8 link client, UI helpers, history) and `esphome/components/st77922_qspi`
+says "240x320", the board is 320x480). Firmware: `firmware/irrigation-screen.yaml`, with
+`firmware/screen/` (the A8 link client, UI helpers, history) and `firmware/components/st77922_qspi`
 (the display driver). It talks to the A8 over a cable, not through Wi-Fi or HA, so it keeps working
 with the router or HA down; the A8 stays the one source of truth and HA sees every change.
 
@@ -47,7 +47,7 @@ Hence `components/st77922_qspi`: a small ESPHome display that drives Espressif's
 ## The link to the A8
 
 UART at 115200, one text line per message ending `*XX` (XOR checksum; bad lines are dropped).
-Protocol in `esphome/irrigation/a8_link.h`:
+Protocol in `firmware/irrigation/a8_link.h`:
 
 - A8 → screen: `N <key> <name>` and `S <key> <value>` for **every entity** (all on `SYNC`, then
   each change), `Z <n> <key>` (which switch is zone n), `H <uptime> <seconds left>` once a second.

@@ -15,6 +15,15 @@ What it adds:
 - **History:** a "watered last 7 days" sensor per zone, with today, per day and the last runs as
   attributes, from HA's own records.
 
+## What's in here
+
+- `custom_components/irrigation_controller/`: the Home Assistant integration
+- `firmware/`: ESPHome firmware for the A8 (`irrigation.yaml`) and its touch screen
+  (`irrigation-screen.yaml`, ES3C35P), with the screen's display driver in `components/`.
+  Put your Wi-Fi and keys in `firmware/secrets.yaml` (not in git).
+- `cad/`: OpenSCAD case, transformer boot and wall template, with ready STLs in `cad/stl/`
+- `docs/`: how it's wired and built
+
 ## Install
 
 Copy `custom_components/irrigation_controller` into HA's `config/custom_components/`, restart

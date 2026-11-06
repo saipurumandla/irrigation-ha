@@ -1,6 +1,6 @@
 # Irrigation controller case
 
-OpenSCAD model of the case planned in [docs/irrigation-case.md](../../docs/irrigation-case.md).
+OpenSCAD model of the case planned in [docs/irrigation-case.md](../docs/irrigation-case.md).
 Every size is a named value at the top of `irrigation_case.scad`; asserts there stop the build
 if a screw, insert or plate lands in a wall or can't go in.
 
