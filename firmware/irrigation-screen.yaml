@@ -151,6 +151,9 @@ globals:
   - id: run_min    # minutes chosen on the zone page
     type: int
     initial_value: "10"
+  - id: run_zone_pending   # Run pressed: the zone to start once its minutes are sent (0 = none)
+    type: int
+    initial_value: "0"
   - id: cur_prog     # the program open on the program page (0-3 = A-D)
     type: int
     initial_value: "0"
@@ -186,6 +189,14 @@ globals:
   - id: slide_last_y
     type: int
     initial_value: "0"
+  # While the bezel is being slid: the level shown, saved to the number only on release (each
+  # step used to set the number, which re-ran refresh_settings and sent a state to HA every few ms).
+  - id: slide_val
+    type: float
+    initial_value: "0"
+  - id: sliding
+    type: bool
+    initial_value: "false"
   - id: screen_state   # 0 awake, 1 dimmed, 2 off
     type: int
     initial_value: "0"
@@ -994,14 +1005,14 @@ script:
           id: backlight
           transition_length: 0s
           brightness: !lambda |-
-            float lvl = id(is_daytime)() ? id(scr_day).state : id(scr_night).state;
+            float lvl = id(sliding) ? id(slide_val) : (id(is_daytime)() ? id(scr_day).state : id(scr_night).state);
             if (id(screen_state) == 1) lvl /= 3;
             return std::max(0.03f, lvl / 100.0f);
       - lvgl.label.update:
           id: bright_tag
           text: !lambda |-
             static char buf[24];
-            snprintf(buf, sizeof(buf), "Brightness %d%%", (int) (id(is_daytime)() ? id(scr_day).state : id(scr_night).state));
+            snprintf(buf, sizeof(buf), "Brightness %d%%", (int) (id(sliding) ? id(slide_val) : (id(is_daytime)() ? id(scr_day).state : id(scr_night).state)));
             return buf;
 
 number:
@@ -1253,19 +1264,26 @@ lvgl:
           radius: 0
           scrollable: false
           on_press:
-            - lambda: id(slide_last_y) = point.y;
+            - lambda: |-
+                id(slide_last_y) = point.y;
+                id(slide_val) = id(is_daytime)() ? id(scr_day).state : id(scr_night).state;
+                id(sliding) = true;
             - lvgl.widget.show: bright_tag
           on_pressing:
             - lambda: |-
                 int dy = id(slide_last_y) - point.y;   // up = positive
                 if (dy == 0) return;
                 id(slide_last_y) = point.y;
-                auto *n = id(is_daytime)() ? id(scr_day) : id(scr_night);
-                auto c = n->make_call();
-                c.set_value(std::max(5.0f, std::min(100.0f, n->state + dy * 0.35f)));
-                c.perform();
+                id(slide_val) = std::max(5.0f, std::min(100.0f, id(slide_val) + dy * 0.35f));
             - script.execute: apply_brightness
           on_release:
+            - lambda: |-
+                if (!id(sliding)) return;
+                id(sliding) = false;
+                auto *n = id(is_daytime)() ? id(scr_day) : id(scr_night);
+                auto c = n->make_call();
+                c.set_value(roundf(id(slide_val)));
+                c.perform();
             - delay: 1500ms
             - lvgl.widget.hide: bright_tag
       # Rename a zone: a popup with a text box and keyboard (the name lives on the A8, so HA sees it)
@@ -2298,7 +2316,9 @@ lvgl:
                   bg_color: 0xE9EEF2
                   shadow_width: 0
                   on_click:
-                    - lambda: if (id(run_min) > 1) id(run_min)--;
+                    - lambda: |-
+                        if (id(run_min) > 1) id(run_min)--;
+                        ui::link().set(ui::zkey(id(cur_zone), "number", "_minutes_by_hand"), std::to_string(id(run_min)));
                     - script.execute: refresh_zone
                   widgets: [{label: {align: CENTER, text_font: montserrat_28, text: "-"}}]
               - label:
@@ -2325,7 +2345,9 @@ lvgl:
                   bg_color: 0xE9EEF2
                   shadow_width: 0
                   on_click:
-                    - lambda: if (id(run_min) < 120) id(run_min)++;
+                    - lambda: |-
+                        if (id(run_min) < 120) id(run_min)++;
+                        ui::link().set(ui::zkey(id(cur_zone), "number", "_minutes_by_hand"), std::to_string(id(run_min)));
                     - script.execute: refresh_zone
                   widgets: [{label: {align: CENTER, text_font: montserrat_28, text: "+"}}]
               - button:
@@ -2337,14 +2359,26 @@ lvgl:
                   bg_color: 0x2E7D32
                   shadow_width: 0
                   on_click:
+                    # Run: the minutes first, then (a moment later, so the A8 has surely taken them)
+                    # the zone. Stop: at once.
                     - lambda: |-
                         const int n = id(cur_zone);
+                        id(run_zone_pending) = 0;
                         if (ui::zone_running(n)) {
                           ui::link().set(ui::link().zone_key(n), "0");
                         } else {
                           ui::link().set(ui::zkey(n, "number", "_minutes_by_hand"), std::to_string(id(run_min)));
-                          ui::link().set(ui::link().zone_key(n), "1");
+                          id(run_zone_pending) = n;
                         }
+                    - if:
+                        condition:
+                          lambda: return id(run_zone_pending) > 0;
+                        then:
+                          - delay: 250ms
+                          - lambda: |-
+                              const int n = id(run_zone_pending);
+                              id(run_zone_pending) = 0;
+                              if (n > 0 && !ui::zone_running(n)) ui::link().set(ui::link().zone_key(n), "1");
                   widgets:
                     - label:
                         id: zd_run_label

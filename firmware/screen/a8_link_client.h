@@ -112,6 +112,21 @@ class Client {
       if ((left > 0) != (this->left_s_ > 0))
         this->changed_ = true;
       this->left_s_ = left;
+      // Self-heal: the A8 says nothing is running but a zone still shows on here (a lost "off"
+      // line): after 3 heartbeats in a row like that, ask for a fresh copy of everything.
+      bool shown = false;
+      for (const auto &k : this->zones_)
+        if (!k.empty() && this->get(k) == "1")
+          shown = true;
+      if (left <= 0 && shown) {
+        if (++this->stale_ >= 3) {
+          ESP_LOGW(LINK_TAG, "A zone shows running but the A8 is idle: resyncing");
+          this->send_("SYNC");
+          this->stale_ = 0;
+        }
+      } else {
+        this->stale_ = 0;
+      }
       return;
     }
     const auto sp = payload.find(' ', 2);
@@ -141,6 +156,7 @@ class Client {
   std::string rx_;
   std::string zones_[8];
   uint32_t last_hb_{0};
+  int stale_{0};
   long left_s_{0};
   bool synced_{false}, changed_{false}, was_up_{false};
 };
