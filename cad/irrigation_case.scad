@@ -575,6 +575,46 @@ module open_view() {   // covers off: what's inside
     color("White") translate([x12 + 1.6, strips_y + 1.6, back + 1]) cube(strip12);
     color("White") translate([x5 + 1.6, strips_y + 1.6, back + 1]) cube(strip5);
 }
+
+// Wall template: a thin frame the size of the box's back, held on the wall (a level on its top
+// edge) to mark the 4 screws and the valve-wire hole. Seen from the front as printed (text up).
+// The screws go where the box hangs from: the top of each keyhole's slot (the box drops 10 mm
+// onto them).
+module wall_template() {
+    t = 0.6;
+    rim = 8;
+    screws = [for (p = keyholes) [p[0], p[1] + 10]];
+    hole_at = [x12 + tw12 / 2 - wall_hole[0] / 2, wall + 8];
+    difference() {
+        union() {
+            difference() {   // outline
+                rcube([W, H, t], 6);
+                translate([rim, rim, -1]) rcube([W - 2 * rim, H - 2 * rim, t + 2], 3);
+            }
+            for (q = screws) {   // a pad per screw, tied to the rim
+                translate(q) cylinder(d = 16, h = t);
+                translate([q[0] < W / 2 ? 0 : q[0], q[1] - 3]) cube([q[0] < W / 2 ? q[0] : W - q[0], 6, t]);
+            }
+            for (q = screws) if (q[1] < H / 2) translate([q[0] - 3, 0]) cube([6, q[1], t]);
+            for (q = screws) if (q[1] > H / 2) translate([q[0] - 3, q[1]]) cube([6, H - q[1], t]);
+            // ring round the valve-wire hole, tied to the bottom rim
+            translate([hole_at[0] - 3, hole_at[1] - 3, 0]) rcube([wall_hole[0] + 6, wall_hole[1] + 6, t], 8);
+            translate([W / 2 - 3, 0]) cube([6, H, t]);   // centre bar (and plumb line)
+            translate([0, 120, 0]) cube([W, 14, t]);        // a bar for the words
+        }
+        for (q = screws) translate([q[0], q[1], -1]) {
+            cylinder(d = 3, h = t + 2);                   // marker / pencil hole
+            for (a = [0, 90]) rotate(a) translate([-7, -0.4]) cube([4, 0.8, t + 2]);   // cross ticks
+            for (a = [0, 90]) rotate(a) translate([3, -0.4]) cube([4, 0.8, t + 2]);
+        }
+        translate([hole_at[0], hole_at[1], -1]) rcube([wall_hole[0], wall_hole[1], t + 2], 6);
+        for (y = [-1, H - 6]) translate([W / 2 - 0.4, y, -1]) cube([0.8, 7, t + 2]);   // centre marks
+    }
+    translate([W / 2, 127, t - 0.01]) linear_extrude(0.4)   // raised words
+        text("UP ^  FRONT  level on top edge", size = 6, halign = "center", valign = "center",
+             font = "Liberation Sans:style=Bold");
+}
+
 if (part == "assembly") assembly(0);
 else if (part == "open") open_view();
 else if (part == "exploded") assembly(45);
@@ -594,3 +634,4 @@ else if (part == "test_screen") test_screen();
 else if (part == "lid_labels") rotate([180, 0, 0]) lid_label();   // same turn as their part
 else if (part == "wiring_cover_labels") rotate([180, 0, 0]) wiring_cover_label();
 else if (part == "clips_labels") clips_labels();
+else if (part == "wall_template") wall_template();
