@@ -12,7 +12,7 @@ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.util import dt as dt_util
+from homeassistant.util import dt as dt_util, slugify
 
 from . import logic
 from .const import CONF_DEVICE_ID, DOMAIN, OPT_ZONES, PROGRAMS
@@ -32,6 +32,7 @@ class Controller:
         self._by_name: dict[tuple[str, str], str] = {}
         self._unsub: list[Any] = []
         self._syncing = False
+        self._zone_unsub: Any = None
 
     # ---- the device and its entities -------------------------------------------------
 
@@ -135,8 +136,6 @@ class Controller:
         self.refresh()
         await self.async_sync_names()  # also works out which zone is which, the first time
         texts = [e.entity_id for e in self.entries if e.domain == "text" and logic.ZONE_TEXT.match(e.original_name)]
-        switches = [self.zone_switch(n) for n in self.zone_of()]
-        switches += [x for n in self.zone_of() if (x := self.opt("switch", f"{self.zone_of()[n]} enabled"))]
 
         @callback
         def names_changed(event: Event[EventStateChangedData]) -> None:
@@ -145,19 +144,33 @@ class Controller:
                 return
             self.hass.async_create_task(self.async_sync_names())
 
+        self._unsub.append(async_track_state_change_event(self.hass, texts, names_changed))
+        self._track_zones()
+
+    @callback
+    def _track_zones(self) -> None:
+        """Follow the zone switches (again after their ids move)."""
+        if self._zone_unsub:
+            self._zone_unsub()
+            self._zone_unsub = None
+        zone_of = self.zone_of()
+        switches = [x for n, base in zone_of.items() for x in (self.opt("switch", base), self.opt("switch", f"{base} enabled")) if x]
+
         @callback
         def zone_changed(event: Event[EventStateChangedData]) -> None:
             async_dispatcher_send(self.hass, SIGNAL_UPDATE.format(self.entry.entry_id))
 
-        self._unsub.append(async_track_state_change_event(self.hass, texts, names_changed))
         if switches:
-            self._unsub.append(async_track_state_change_event(self.hass, switches, zone_changed))
+            self._zone_unsub = async_track_state_change_event(self.hass, switches, zone_changed)
 
     @callback
     def async_stop(self) -> None:
         for u in self._unsub:
             u()
         self._unsub.clear()
+        if self._zone_unsub:
+            self._zone_unsub()
+            self._zone_unsub = None
 
     # ---- zones: which firmware zone is which ------------------------------------------
 
@@ -238,12 +251,38 @@ class Controller:
             for eid, name in plan.items():
                 reg.async_update_entity(eid, name=name)
                 _LOGGER.debug("Renamed %s to %s", eid, name)
-            if plan:
+            moved = self._sync_ids(zone_of, suffixes)
+            if plan or moved:
                 self.refresh()
+            if moved:
+                self._track_zones()
             async_dispatcher_send(self.hass, SIGNAL_UPDATE.format(self.entry.entry_id))
-            return len(plan)
+            return len(plan) + moved
         finally:
             self._syncing = False
+
+    def _sync_ids(self, zone_of: dict[int, str], suffixes: list[str]) -> int:
+        """Give each zone's entities zone-numbered ids. Two steps, so ids can trade places."""
+        reg = er.async_get(self.hass)
+        watered = {}
+        for e in er.async_entries_for_config_entry(reg, self.entry.entry_id):
+            n = e.unique_id.removesuffix("_watered_7_days").rsplit("_zone_", 1)[-1]
+            if e.unique_id.endswith("_watered_7_days") and n.isdigit() and self.hass.states.get(e.entity_id):
+                watered[int(n)] = e.entity_id  # only once it's running: a sensor still being added keeps its id
+        plan = logic.plan_ids(self.entries, zone_of, suffixes, self.device_name, slugify, watered)
+        # Leave alone anything whose new id is held by an entity that isn't moving.
+        while bad := [a for a, b in plan.items() if b not in plan and reg.async_get(b)]:
+            for a in bad:
+                _LOGGER.warning("Can't move %s to %s: that id is taken", a, plan.pop(a))
+        temp = {}
+        for i, (old, new) in enumerate(plan.items()):
+            t = f"{new.split('.', 1)[0]}.{DOMAIN}_moving_{i}"
+            reg.async_update_entity(old, new_entity_id=t)
+            temp[t] = new
+        for t, new in temp.items():
+            reg.async_update_entity(t, new_entity_id=new)
+            _LOGGER.info("Entity id now %s", new)
+        return len(plan)
 
     # ---- actions -------------------------------------------------------------------------
 

@@ -56,6 +56,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: IrrigationConfigEntry) -
     entry.runtime_data = controller
     await controller.async_start()
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    await controller.async_sync_names()  # again, now its own sensors are up: their ids too
     _register_services(hass)
     return True
 

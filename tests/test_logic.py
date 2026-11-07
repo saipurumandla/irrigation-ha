@@ -91,3 +91,14 @@ def test_runs_and_minutes():
     assert rs == [(m(10), m(25)), (m(60), m(61)), (m(90), m(100))]
     assert logic.minutes_between(rs, m(0), m(200)) == 26.0
     assert logic.minutes_between(rs, m(20), m(95)) == 11.0
+
+
+def test_ids_go_by_zone_number():
+    zone_of = {1: "Left front", 2: "Drip", 6: "Zone 6"}
+    plan = logic.plan_ids(ENTRIES, zone_of, SUFFIXES, "Irrigation", slug, {1: "sensor.irrigation_right_front_watered_last_7_days"})
+    assert plan["switch.irrigation_left_front"] == "switch.irrigation_zone_1"
+    assert plan["number.irrigation_drip_minutes_by_hand"] == "number.irrigation_zone_2_minutes_by_hand"
+    assert plan["sensor.irrigation_left_front_last_run"] == "sensor.irrigation_zone_1_last_run"
+    assert plan["sensor.irrigation_right_front_watered_last_7_days"] == "sensor.irrigation_zone_1_watered_last_7_days"
+    assert "switch.irrigation_zone_6" not in plan  # already right
+    assert not any("program" in k for k in plan)

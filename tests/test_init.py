@@ -82,21 +82,39 @@ async def test_setup_finds_zones_and_renames(hass: HomeAssistant):
     # Zone 3 was renamed before: the last one left is Sides.
     assert entry.options["zones"] == {"1": "Left front", "2": "Drip", "3": "Sides"}
     reg = er.async_get(hass)
-    assert reg.async_get("switch.irrigation_sides").name == "Irrigation Back Bed"
-    assert reg.async_get("number.irrigation_sides_minutes_by_hand").name == "Irrigation Back Bed minutes by hand"
+    # Ids go by zone number; names follow the zone's name.
+    assert reg.async_get("switch.irrigation_zone_3").original_name == "Sides"
+    assert reg.async_get("switch.irrigation_zone_3").name == "Irrigation Back Bed"
+    assert reg.async_get("number.irrigation_zone_3_minutes_by_hand").name == "Irrigation Back Bed minutes by hand"
     assert reg.async_get("number.irrigation_program_b_zone_3_minutes").name == "Irrigation Program B Back Bed minutes"
-    assert reg.async_get("switch.irrigation_drip").name is None
+    assert reg.async_get("switch.irrigation_sides") is None
+    assert reg.async_get("switch.irrigation_zone_2").name is None
+    assert hass.states.get("sensor.irrigation_zone_3_watered_last_7_days") is not None
 
-    # A rename on the screen reaches HA by itself.
+    # A rename on the screen reaches HA by itself, and the ids stay put.
     hass.states.async_set("text.irrigation_zone_2_name", "Drip Front")
     await hass.async_block_till_done()
-    assert reg.async_get("switch.irrigation_drip_enabled").name == "Irrigation Drip Front enabled"
+    assert reg.async_get("switch.irrigation_zone_2_enabled").name == "Irrigation Drip Front enabled"
 
     # And an empty name puts the firmware's back.
     hass.states.async_set("text.irrigation_zone_3_name", "")
     await hass.async_block_till_done()
-    assert reg.async_get("switch.irrigation_sides").name is None
+    assert reg.async_get("switch.irrigation_zone_3").name is None
     assert reg.async_get("number.irrigation_program_a_zone_3_minutes").name is None
+
+
+async def test_zones_swap_names(hass: HomeAssistant):
+    dev, _ = await setup_controller(hass)
+    await add_entry(hass, dev)
+    reg = er.async_get(hass)
+    hass.states.async_set("text.irrigation_zone_1_name", "Back Bed")
+    await hass.async_block_till_done()
+    hass.states.async_set("text.irrigation_zone_3_name", "Left front")
+    await hass.async_block_till_done()
+    assert reg.async_get("switch.irrigation_zone_1").name == "Irrigation Back Bed"
+    assert reg.async_get("switch.irrigation_zone_3").name == "Irrigation Left front"
+    assert reg.async_get("sensor.irrigation_zone_1_watered_last_7_days") is not None
+    assert not [e for e in reg.entities.values() if "_moving_" in e.entity_id or e.entity_id.endswith("days_2")]
 
 
 async def test_actions(hass: HomeAssistant):
@@ -106,8 +124,8 @@ async def test_actions(hass: HomeAssistant):
 
     await hass.services.async_call(DOMAIN, "run_zone", {"zone": "back bed", "minutes": 4}, blocking=True)
     assert calls == [
-        ("number", "set_value", {"entity_id": "number.irrigation_sides_minutes_by_hand", "value": 4}),
-        ("switch", "turn_on", {"entity_id": "switch.irrigation_sides"}),
+        ("number", "set_value", {"entity_id": "number.irrigation_zone_3_minutes_by_hand", "value": 4}),
+        ("switch", "turn_on", {"entity_id": "switch.irrigation_zone_3"}),
     ]
     calls.clear()
 
@@ -139,7 +157,7 @@ async def test_apply_button_and_history_sensors(hass: HomeAssistant):
     dev, _ = await setup_controller(hass)
     await add_entry(hass, dev)
     assert hass.states.get("button.irrigation_apply_zone_names") is not None
-    s = hass.states.get("sensor.irrigation_back_bed_watered_last_7_days")
+    s = hass.states.get("sensor.irrigation_zone_3_watered_last_7_days")
     assert s is not None and s.attributes["zone"] == 3
 
 
@@ -148,8 +166,8 @@ async def test_zone_map(hass: HomeAssistant):
     await add_entry(hass, dev)
     s = hass.states.get("sensor.irrigation_zones")
     zones = {z["zone"]: z for z in s.attributes["zones"]}
-    assert zones[3]["name"] == "Back Bed" and zones[3]["switch"] == "switch.irrigation_sides"
-    assert zones[3]["watered"] == "sensor.irrigation_back_bed_watered_last_7_days"
+    assert zones[3]["name"] == "Back Bed" and zones[3]["switch"] == "switch.irrigation_zone_3"
+    assert zones[3]["watered"] == "sensor.irrigation_zone_3_watered_last_7_days"
     progs = {p["program"]: p for p in s.attributes["programs"]}
     assert progs["B"]["minutes"]["3"] == "number.irrigation_program_b_zone_3_minutes"
     assert s.attributes["controls"]["stop"] == "button.irrigation_stop"

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -123,6 +124,32 @@ def plan_names(
                 continue
             if e.name != want:
                 out[e.entity_id] = want
+    return out
+
+
+def plan_ids(
+    entries: list[Entry],
+    zone_of: dict[int, str],
+    suffixes: list[str],
+    device: str,
+    slug: Callable[[str], str],
+    watered: dict[int, str] | None = None,
+) -> dict[str, str]:
+    """entity id -> its zone-numbered id ("switch.irrigation_zone_1_enabled").
+
+    Ids go by zone number, never by name, so renaming a zone changes only what HA shows (the
+    way a program's "zone 1 minutes" already is). `watered` is zone -> our "watered" sensor.
+    """
+    out: dict[str, str] = {}
+    for z, base in zone_of.items():
+        for e in entries:
+            s = next((x for x in suffixes if e.original_name == base + x), None)
+            if s is not None and (want := f"{e.domain}.{slug(full(device, f'Zone {z}{s}'))}") != e.entity_id:
+                out[e.entity_id] = want
+        if watered and (eid := watered.get(z)):
+            want = f"sensor.{slug(full(device, f'Zone {z} watered last 7 days'))}"
+            if want != eid:
+                out[eid] = want
     return out
 
 
