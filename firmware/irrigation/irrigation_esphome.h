@@ -37,6 +37,7 @@ struct ProgramEntities {
   select::Select *mode = nullptr;
   text::Text *days = nullptr, *starts = nullptr;
   number::Number *interval = nullptr;
+  number::Number *starts_in = nullptr;  // every N days: days until the next watering day
   int *anchor = nullptr;  // survives restarts
   number::Number *minutes[MAX_ZONES] = {};
 };
@@ -140,10 +141,23 @@ class Controller {
     publish_next(today, minute);
   }
 
-  /** A program's "every N days" changed: count from today. */
-  void reset_anchor(int i) {
+  /** A program's "every N days" changed to n: keep the next watering day where it was (under n). */
+  void reset_anchor(int i, float n) {
     int today, minute;
-    if (programs[i].anchor && local_now(today, minute)) *programs[i].anchor = today;
+    if (!programs[i].anchor || !local_now(today, minute)) return;
+    Program p = cfg_programs_[i];
+    p.interval = std::max(1, num(programs[i].interval, 1));
+    p.anchor = *programs[i].anchor;
+    *programs[i].anchor = anchor_in(today, days_until(p, today), static_cast<int>(std::lround(n)));
+  }
+
+  /** "Starts in": the next watering day is this many days away (0 = today), then every N days. */
+  void set_starts_in(int i, float days) {
+    int today, minute;
+    if (!programs[i].anchor) return;
+    if (!local_now(today, minute)) { tell("Can't set when a program starts until the clock is set"); return; }
+    *programs[i].anchor = anchor_in(today, static_cast<int>(std::lround(days)), num(programs[i].interval, 1));
+    changed();
   }
 
   // ── Every second and every minute ──
@@ -172,6 +186,7 @@ class Controller {
         if (p.starts[s] == minute) scheduled_start(i, today, minute);
     }
     publish_rain_delay(today);
+    publish_starts_in(today);
     publish_next(today, minute);
     publish_status();
   }
@@ -180,7 +195,10 @@ class Controller {
   void changed() {
     refresh();
     int today, minute;
-    if (local_now(today, minute)) publish_next(today, minute);
+    if (local_now(today, minute)) {
+      publish_starts_in(today);
+      publish_next(today, minute);
+    }
   }
 
   /** Seconds left in the current run (0 when idle): the screen's countdown. */
@@ -384,6 +402,15 @@ class Controller {
     if (!rain_delay) return;
     const float left = rain_until && *rain_until > today ? *rain_until - today : 0;
     if (!rain_delay->has_state() || rain_delay->state != left) rain_delay->publish_state(left);
+  }
+
+  void publish_starts_in(int today) {
+    for (int i = 0; i < MAX_PROGRAMS; i++) {
+      auto *n = programs[i].starts_in;
+      if (!n) continue;
+      const float d = days_until(cfg_programs_[i], today);
+      if (!n->has_state() || n->state != d) n->publish_state(d);
+    }
   }
 
   void publish_next(int today, int minute) {

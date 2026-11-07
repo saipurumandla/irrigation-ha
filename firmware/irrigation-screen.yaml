@@ -712,6 +712,9 @@ script:
             ui::vis(id(pg_days_row), custom);
             ui::vis(id(pg_cyc), mode == "Every N days");
             ui::text(id(pg_cyc_v), std::to_string(ui::prog_every(p)));
+            ui::vis(id(pg_next), mode == "Every N days");
+            { const int d = ui::prog_starts_in(p);
+              ui::text(id(pg_next_v), d <= 0 ? "Today" : d == 1 ? "Tomorrow" : "In " + std::to_string(d) + " days"); }
             const uint8_t dm = ui::prog_days(p);
             ui::bg(id(pg_d0), (dm & 1) ? 0x2E7D32 : 0xE9EEF2); ui::fg(id(pg_d0_l), (dm & 1) ? 0xFFFFFF : ${ink});
             ui::bg(id(pg_d1), (dm & 2) ? 0x2E7D32 : 0xE9EEF2); ui::fg(id(pg_d1_l), (dm & 2) ? 0xFFFFFF : ${ink});
@@ -3007,6 +3010,44 @@ lvgl:
                                     ui::link().set(ui::pkey(id(cur_prog), "number", "_every_n_days"), std::to_string(std::min(30, ui::prog_every(id(cur_prog)) + 1)));
                               widgets: [{label: {align: CENTER, text_font: montserrat_24, text: "+"}}]
                           - label: {align: LEFT_MID, x: 212, text_font: montserrat_18, text: "days"}
+
+                    # When the cycle starts: today, tomorrow, in N days (Rain Bird's "days remaining").
+                    - obj:
+                        id: pg_next
+                        width: 100%
+                        height: 44
+                        bg_opa: TRANSP
+                        border_width: 0
+                        pad_all: 0
+                        scrollable: false
+                        widgets:
+                          - label: {align: LEFT_MID, text_font: montserrat_18, text: "Next"}
+                          - button:
+                              align: LEFT_MID
+                              x: 70
+                              width: 40
+                              height: 40
+                              radius: 20
+                              bg_color: 0xE9EEF2
+                              shadow_width: 0
+                              on_click:
+                                - lambda: |-
+                                    ui::link().set(ui::pkey(id(cur_prog), "number", "_starts_in"), std::to_string(std::max(0, ui::prog_starts_in(id(cur_prog)) - 1)));
+                              widgets: [{label: {align: CENTER, text_font: montserrat_24, text: "-"}}]
+                          - label: {id: pg_next_v, align: LEFT_MID, x: 112, width: 104, text_align: CENTER, text_font: montserrat_18, text: ""}
+                          - button:
+                              align: LEFT_MID
+                              x: 218
+                              width: 40
+                              height: 40
+                              radius: 20
+                              bg_color: 0xE9EEF2
+                              shadow_width: 0
+                              on_click:
+                                - lambda: |-
+                                    const int p = id(cur_prog);
+                                    ui::link().set(ui::pkey(p, "number", "_starts_in"), std::to_string(std::min(ui::prog_every(p) - 1, ui::prog_starts_in(p) + 1)));
+                              widgets: [{label: {align: CENTER, text_font: montserrat_24, text: "+"}}]
               - obj:
                   styles: card_style
                   width: 100%

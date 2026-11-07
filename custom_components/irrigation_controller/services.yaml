@@ -93,6 +93,12 @@ set_program:
         number:
           min: 1
           max: 30
+    starts_in:
+      selector:
+        number:
+          min: 0
+          max: 29
+          unit_of_measurement: days
     start_times:
       example: '["6:00", "18:30"]'
       selector:

@@ -93,6 +93,13 @@ static void days_and_guard() {
   CHECK("interval: +1 doesn't", !day_matches(p, day(2026, 10, 30)));
   CHECK("interval: +3 runs", day_matches(p, day(2026, 11, 1)));
   CHECK("interval: before the anchor doesn't", !day_matches(p, day(2026, 10, 26)));
+  CHECK("interval: next day from the anchor", days_until(p, day(2026, 10, 29)) == 0);
+  CHECK("interval: 2 days to go the day after", days_until(p, day(2026, 10, 30)) == 2);
+  CHECK("interval: 1 day to go", days_until(p, day(2026, 10, 31)) == 1);
+  p.anchor = anchor_in(day(2026, 11, 6), 1, 3);
+  CHECK("interval: starts tomorrow", days_until(p, day(2026, 11, 6)) == 1 && !day_matches(p, day(2026, 11, 6)) &&
+                                         day_matches(p, day(2026, 11, 7)) && day_matches(p, day(2026, 11, 10)));
+  CHECK("interval: start kept under N", anchor_in(day(2026, 11, 6), 9, 3) == day(2026, 11, 8));
 
   p.mode = DayMode::ODD;
   CHECK("odd: the 29th runs", day_matches(p, day(2026, 10, 29)));

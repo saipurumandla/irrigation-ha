@@ -95,6 +95,10 @@ inline int prog_every(int p) {
   const float v = link().get_float(pkey(p, "number", "_every_n_days"));
   return std::isnan(v) ? 2 : (int) lroundf(v);
 }
+inline int prog_starts_in(int p) {  // every N days: days to the next watering day
+  const float v = link().get_float(pkey(p, "number", "_starts_in"));
+  return std::isnan(v) ? 0 : (int) lroundf(v);
+}
 inline int prog_minutes(int p, int zone) {
   const float v = link().get_float(pkey(p, "number", ("_zone_" + std::to_string(zone) + "_minutes").c_str()));
   return std::isnan(v) ? 0 : (int) lroundf(v);

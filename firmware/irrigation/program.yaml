@@ -13,6 +13,7 @@ esphome:
           p.starts = id(program_${p}_starts);
           p.interval = id(program_${p}_every_days);
           p.anchor = &id(program_${p}_anchor);
+          p.starts_in = id(program_${p}_starts_in);
           p.minutes[0] = id(program_${p}_zone_1);
           p.minutes[1] = id(program_${p}_zone_2);
           p.minutes[2] = id(program_${p}_zone_3);
@@ -23,7 +24,7 @@ esphome:
           p.minutes[7] = id(program_${p}_zone_8);
 
 globals:
-  # The day "every N days" counts from (set when N is changed).
+  # The day "every N days" counts from (moved by "starts in", kept when N changes).
   - id: program_${p}_anchor
     type: int
     restore_value: true
@@ -98,7 +99,23 @@ number:
     optimistic: true
     restore_value: true
     set_action:
-      - lambda: irrigation::ctl().reset_anchor(${i});
+      - lambda: irrigation::ctl().reset_anchor(${i}, x);
+    on_value:
+      - lambda: irrigation::ctl().changed();
+
+  # Every N days: 0 = today is a watering day, 1 = tomorrow... (like Rain Bird's "days remaining").
+  - platform: template
+    id: program_${p}_starts_in
+    name: "Program ${p} starts in"
+    icon: mdi:calendar-arrow-right
+    entity_category: config
+    mode: box
+    unit_of_measurement: d
+    min_value: 0
+    max_value: 29
+    step: 1
+    set_action:
+      - lambda: irrigation::ctl().set_starts_in(${i}, x);
 
   - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 1 } }
   - !include { file: program-minutes.yaml, vars: { p: "${p}", z: 2 } }

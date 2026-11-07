@@ -50,6 +50,7 @@ async def setup_controller(hass: HomeAssistant):
         add("text", f"Program {p} days", "")
         add("text", f"Program {p} start times", "")
         add("number", f"Program {p} every N days", "2")
+        add("number", f"Program {p} starts in", "0")
 
     calls = []
 
@@ -115,7 +116,7 @@ async def test_actions(hass: HomeAssistant):
     calls.clear()
 
     await hass.services.async_call(DOMAIN, "set_program", {
-        "program": "b", "enabled": True, "day_mode": "every_n_days", "every_n_days": 3,
+        "program": "b", "enabled": True, "day_mode": "every_n_days", "every_n_days": 3, "starts_in": 1,
         "days": ["fri", "Mon"], "start_times": ["18:30", "6:00"], "minutes": {"Back Bed": 15, "1": 5},
     }, blocking=True)
     got = {(c[0], c[2]["entity_id"]): c[2] for c in calls}
@@ -125,6 +126,9 @@ async def test_actions(hass: HomeAssistant):
     assert got[("text", "text.irrigation_program_b_start_times")]["value"] == "6:00, 18:30"
     assert got[("number", "number.irrigation_program_b_zone_3_minutes")]["value"] == 15
     assert got[("number", "number.irrigation_program_b_zone_1_minutes")]["value"] == 5
+    order = [c[2]["entity_id"] for c in calls]
+    assert got[("number", "number.irrigation_program_b_starts_in")]["value"] == 1
+    assert order.index("number.irrigation_program_b_starts_in") > order.index("number.irrigation_program_b_every_n_days")
     calls.clear()
 
     await hass.services.async_call(DOMAIN, "stop", {}, blocking=True)

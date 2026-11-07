@@ -252,6 +252,18 @@ inline bool day_matches(const Program &p, int day) {
   return false;
 }
 
+/** Every N days: how many days until the next watering day (0 = today). */
+inline int days_until(const Program &p, int today) {
+  const int n = std::max(1, p.interval);
+  if (p.anchor >= today) return p.anchor - today;
+  return (n - (today - p.anchor) % n) % n;
+}
+
+/** The anchor that makes the next watering day `days` from today (kept under N). */
+inline int anchor_in(int today, int days, int interval) {
+  return today + std::max(0, std::min(days, std::max(1, interval) - 1));
+}
+
 inline bool in_window(int from, int to, int minute) {
   if (from < 0) return false;
   return from < to ? (minute >= from && minute < to) : (minute >= from || minute < to);

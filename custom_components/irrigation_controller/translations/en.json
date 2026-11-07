@@ -54,6 +54,7 @@
         "day_mode": { "name": "Which days", "description": "Days of the week, every N days, odd or even dates." },
         "days": { "name": "Days", "description": "For days of the week." },
         "every_n_days": { "name": "Every N days", "description": "For every N days." },
+        "starts_in": { "name": "Starts in", "description": "For every N days: 0 waters today, 1 tomorrow, and so on." },
         "start_times": { "name": "Start times", "description": "Up to 4, like [\"6:00\", \"18:30\"]." },
         "minutes": { "name": "Minutes per zone", "description": "Zone (number or name) to minutes; 0 skips the zone." },
         "device_id": { "name": "Controller", "description": "Only needed with more than one controller." }

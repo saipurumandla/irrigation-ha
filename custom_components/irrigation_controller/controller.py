@@ -97,6 +97,7 @@ class Controller:
                 "day_mode": self.opt("select", f"Program {p} day mode"),
                 "days": self.opt("text", f"Program {p} days"),
                 "every_n_days": self.opt("number", f"Program {p} every N days"),
+                "starts_in": self.opt("number", f"Program {p} starts in"),
                 "start_times": self.opt("text", f"Program {p} start times"),
                 "minutes": {str(z["zone"]): self.opt("number", f"Program {p} zone {z['zone']} minutes") for z in zones},
             })
@@ -286,6 +287,8 @@ class Controller:
                 await self._call("text", "set_value", self.entity("text", f"Program {p} days"), value=logic.days_text(data["days"]))
             if "every_n_days" in data:
                 await self._call("number", "set_value", self.entity("number", f"Program {p} every N days"), value=data["every_n_days"])
+            if "starts_in" in data:  # after every_n_days: the controller keeps it under N
+                await self._call("number", "set_value", self.entity("number", f"Program {p} starts in"), value=data["starts_in"])
             if "start_times" in data:
                 await self._call("text", "set_value", self.entity("text", f"Program {p} start times"), value=logic.times_text(data["start_times"]))
             for zone, minutes in (data.get("minutes") or {}).items():

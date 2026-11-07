@@ -42,6 +42,7 @@ SCHEMAS = {
         vol.Optional("day_mode"): cv.string,
         vol.Optional("days"): vol.Any(cv.string, [cv.string]),
         vol.Optional("every_n_days"): vol.All(vol.Coerce(int), vol.Range(1, 30)),
+        vol.Optional("starts_in"): vol.All(vol.Coerce(int), vol.Range(0, 29)),
         vol.Optional("start_times"): vol.Any(cv.string, [cv.string]),
         vol.Optional("minutes"): {ZONE: vol.All(vol.Coerce(int), vol.Range(0, 240))},
     }),
