@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Any
@@ -251,7 +252,7 @@ class Controller:
             for eid, name in plan.items():
                 reg.async_update_entity(eid, name=name)
                 _LOGGER.debug("Renamed %s to %s", eid, name)
-            moved = self._sync_ids(zone_of, suffixes)
+            moved = await self._sync_ids(zone_of, suffixes)
             if plan or moved:
                 self.refresh()
             if moved:
@@ -261,7 +262,7 @@ class Controller:
         finally:
             self._syncing = False
 
-    def _sync_ids(self, zone_of: dict[int, str], suffixes: list[str]) -> int:
+    async def _sync_ids(self, zone_of: dict[int, str], suffixes: list[str]) -> int:
         """Give each zone's entities zone-numbered ids. Two steps, so ids can trade places."""
         reg = er.async_get(self.hass)
         watered = {}
@@ -274,11 +275,20 @@ class Controller:
         while bad := [a for a, b in plan.items() if b not in plan and reg.async_get(b)]:
             for a in bad:
                 _LOGGER.warning("Can't move %s to %s: that id is taken", a, plan.pop(a))
+        # One rename per entity where the new id is free: a running entity follows one rename,
+        # not two in a row. Only ids that trade places go through a temporary id, with a pause.
+        todo = dict(plan)
+        while free := [a for a, b in todo.items() if not reg.async_get(b)]:
+            for a in free:
+                reg.async_update_entity(a, new_entity_id=todo.pop(a))
+                _LOGGER.info("Entity id now %s", plan[a])
         temp = {}
-        for i, (old, new) in enumerate(plan.items()):
+        for i, (old, new) in enumerate(todo.items()):
             t = f"{new.split('.', 1)[0]}.{DOMAIN}_moving_{i}"
             reg.async_update_entity(old, new_entity_id=t)
             temp[t] = new
+        if temp:
+            await asyncio.sleep(2)  # let each entity move to its temporary id first
         for t, new in temp.items():
             reg.async_update_entity(t, new_entity_id=new)
             _LOGGER.info("Entity id now %s", new)
